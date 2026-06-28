@@ -102,18 +102,26 @@ function renderWheel(wheelId, selectedIndex, onSelect) {
 
   updateWheelSelection(wheel, selectedIndex);
   requestAnimationFrame(() => scrollToIndex(wheel, selectedIndex));
+let scrollTimer;
+let lastIndex = selectedIndex;
 
-  let scrollTimer;
+wheel.addEventListener("scroll", () => {
+  const liveIndex = getCenteredIndex(wheel);
 
-  wheel.addEventListener("scroll", () => {
-    clearTimeout(scrollTimer);
+  if (liveIndex !== lastIndex) {
+    lastIndex = liveIndex;
+    onSelect(liveIndex);
+  }
 
-    scrollTimer = setTimeout(() => {
-      const index = getCenteredIndex(wheel);
-      onSelect(index);
-      scrollToIndex(wheel, index);
-    }, 90);
-  });
+  clearTimeout(scrollTimer);
+
+  scrollTimer = setTimeout(() => {
+    const finalIndex = getCenteredIndex(wheel);
+    lastIndex = finalIndex;
+    onSelect(finalIndex);
+    scrollToIndex(wheel, finalIndex);
+  }, 90);
+});
 }
 
 function getCenteredIndex(wheel) {
