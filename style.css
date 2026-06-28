@@ -155,6 +155,8 @@ h1 {
   margin-top: -2px;
 }
 
+
+
 .wheel {
   position: relative;
   width: 100%;
@@ -165,6 +167,9 @@ h1 {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   background: transparent;
+  display: flex;
+    flex-direction: column;
+    align-items: center;
 
   mask-image: linear-gradient(
     to bottom,
@@ -196,7 +201,7 @@ h1 {
 .wheel-item {
   height: 56px;
   scroll-snap-align: center;
-  display: grid;
+  display: flex;
   place-items: center;
   opacity: 0.28;
   transform: scale(0.92);
