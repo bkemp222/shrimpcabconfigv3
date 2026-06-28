@@ -1,6 +1,3 @@
-const bodyPicker = document.getElementById("bodyColor");
-const stripePicker = document.getElementById("stripeColor");
-
 const bodyHex = document.getElementById("bodyHex");
 const stripeHex = document.getElementById("stripeHex");
 
@@ -12,7 +9,6 @@ async function loadSVG(layerId, path) {
   layer.innerHTML = svgText;
 
   const svg = layer.querySelector("svg");
-
   svg.removeAttribute("width");
   svg.removeAttribute("height");
   svg.style.width = "100%";
@@ -31,25 +27,45 @@ function setLayerColor(layerId, color) {
   });
 }
 
-function updateColors() {
-  const bodyColor = bodyPicker.value;
-  const stripeColor = stripePicker.value;
+function updateBody(color) {
+  const hex = color.hexString;
+  setLayerColor("bodyLayer", hex);
+  bodyHex.textContent = hex.toUpperCase();
+}
 
-  setLayerColor("bodyLayer", bodyColor);
-  setLayerColor("stripeLayer", stripeColor);
-
-  bodyHex.textContent = bodyColor.toUpperCase();
-  stripeHex.textContent = stripeColor.toUpperCase();
+function updateStripes(color) {
+  const hex = color.hexString;
+  setLayerColor("stripeLayer", hex);
+  stripeHex.textContent = hex.toUpperCase();
 }
 
 async function init() {
   await loadSVG("bodyLayer", "assets/liveries/tiger/212_tiger_body.svg");
   await loadSVG("stripeLayer", "assets/liveries/tiger/212_tiger_stripes.svg");
 
-  updateColors();
+  const bodyPicker = new iro.ColorPicker("#bodyPicker", {
+    width: 260,
+    color: "#5b3a29",
+    layout: [
+      { component: iro.ui.Wheel },
+      { component: iro.ui.Slider, options: { sliderType: "value" } }
+    ]
+  });
 
-  bodyPicker.addEventListener("input", updateColors);
-  stripePicker.addEventListener("input", updateColors);
+  const stripePicker = new iro.ColorPicker("#stripePicker", {
+    width: 260,
+    color: "#d8a11d",
+    layout: [
+      { component: iro.ui.Wheel },
+      { component: iro.ui.Slider, options: { sliderType: "value" } }
+    ]
+  });
+
+  bodyPicker.on("color:change", updateBody);
+  stripePicker.on("color:change", updateStripes);
+
+  updateBody(bodyPicker.color);
+  updateStripes(stripePicker.color);
 }
 
 init();
