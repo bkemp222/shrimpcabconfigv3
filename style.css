@@ -139,24 +139,47 @@ h1 {
   font-size: 0.72rem;
 }
 
-.wheel-hint {
-  margin-top: 4px;
-  color: rgba(0, 0, 0, 0.42);
-  font-size: 1rem;
-  line-height: 0.9;
-  letter-spacing: -0.1em;
+.wheel-arrow {
+  color: rgba(0, 0, 0, 0.38);
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.wheel-arrow.up {
+  margin-top: 6px;
+  margin-bottom: -2px;
+}
+
+.wheel-arrow.down {
+  margin-top: -2px;
 }
 
 .wheel {
   position: relative;
   width: 100%;
   max-width: 120px;
-  height: 200px;
+  height: 112px;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   background: transparent;
+
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 22%,
+    black 78%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 22%,
+    black 78%,
+    transparent 100%
+  );
 }
 
 .wheel::-webkit-scrollbar {
@@ -167,16 +190,16 @@ h1 {
 .wheel::after {
   content: "";
   display: block;
-  height: 70px;
+  height: 28px;
 }
 
 .wheel-item {
-  height: 62px;
+  height: 56px;
   scroll-snap-align: center;
   display: grid;
   place-items: center;
-  opacity: 0.34;
-  transform: scale(0.78);
+  opacity: 0.28;
+  transform: scale(0.92);
   transition:
     opacity 160ms ease,
     transform 160ms ease,
