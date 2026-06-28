@@ -81,6 +81,12 @@ h1 {
   height: auto;
 }
 
+.piping{
+    z-index:4;
+    pointer-events:none;
+}
+
+
 .shadows {
   z-index: 4;
   mix-blend-mode: multiply;
