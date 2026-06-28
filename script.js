@@ -1,6 +1,9 @@
 const bodyPicker = document.getElementById("bodyColor");
 const stripePicker = document.getElementById("stripeColor");
 
+const bodyHex = document.getElementById("bodyHex");
+const stripeHex = document.getElementById("stripeHex");
+
 async function loadSVG(layerId, path) {
   const response = await fetch(path);
   const svgText = await response.text();
@@ -12,9 +15,8 @@ async function loadSVG(layerId, path) {
 
   svg.removeAttribute("width");
   svg.removeAttribute("height");
-
   svg.style.width = "100%";
-  svg.style.height = "100%";
+  svg.style.height = "auto";
 }
 
 function setLayerColor(layerId, color) {
@@ -23,15 +25,21 @@ function setLayerColor(layerId, color) {
 
   if (!svg) return;
 
-  svg.querySelectorAll("path, polygon, rect, circle, ellipse, g, compoundpath").forEach(el => {
+  svg.querySelectorAll("path, polygon, rect, circle, ellipse").forEach(el => {
     el.style.fill = color;
     el.setAttribute("fill", color);
   });
 }
 
 function updateColors() {
-  setLayerColor("bodyLayer", bodyPicker.value);
-  setLayerColor("stripeLayer", stripePicker.value);
+  const bodyColor = bodyPicker.value;
+  const stripeColor = stripePicker.value;
+
+  setLayerColor("bodyLayer", bodyColor);
+  setLayerColor("stripeLayer", stripeColor);
+
+  bodyHex.textContent = bodyColor.toUpperCase();
+  stripeHex.textContent = stripeColor.toUpperCase();
 }
 
 async function init() {

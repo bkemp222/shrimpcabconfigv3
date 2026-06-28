@@ -1,63 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Shrimp Config Test</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shrimp Config V2 Test</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Shrimp Cab Co.</p>
+        <h1>Configurator V2 Test</h1>
+      </div>
+    </header>
 
-<div id="controls">
+    <section class="preview-card">
+      <div id="cabinet">
+        <img class="layer base" src="assets/base/212_base_v2.png" />
 
-    <div>
+        <div id="bodyLayer" class="layer color-layer body-layer"></div>
+        <div id="stripeLayer" class="layer color-layer stripe-layer"></div>
 
-        <label>Body</label><br>
+        <img class="layer shadows" src="assets/overlays/shadows.png" />
+        <img class="layer spotlight" src="assets/overlays/spotlight.png" />
+        <img class="layer highlights" src="assets/overlays/highlights.png" />
+      </div>
+    </section>
 
-        <input
-            type="color"
-            id="bodyColor"
-            value="#5b3a29"
-        >
+    <section class="controls-card">
+      <div class="control">
+        <label for="bodyColor">Body</label>
+        <input type="color" id="bodyColor" value="#5b3a29" />
+        <span id="bodyHex">#5B3A29</span>
+      </div>
 
-    </div>
+      <div class="control">
+        <label for="stripeColor">Stripes</label>
+        <input type="color" id="stripeColor" value="#d8a11d" />
+        <span id="stripeHex">#D8A11D</span>
+      </div>
+    </section>
+  </main>
 
-    <div>
-
-        <label>Stripes</label><br>
-
-        <input
-            type="color"
-            id="stripeColor"
-            value="#d8a11d"
-        >
-
-    </div>
-
-</div>
-
-
-<div id="cabinet">
-
-  <img class="layer base" src="assets/base/212_base_v2.png">
-
-  <div id="bodyLayer" class="layer color-layer"></div>
-
-  <div id="stripeLayer" class="layer color-layer"></div>
-
-  <img class="layer shadows" src="assets/overlays/shadows.png">
-  <img class="layer spotlight" src="assets/overlays/spotlight.png">
-  <img class="layer highlights" src="assets/overlays/highlights.png">
-
-</div>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
