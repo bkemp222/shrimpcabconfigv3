@@ -412,7 +412,8 @@ function scrollColorWheelToIndex(wheel, index, behavior = "smooth") {
   if (!item) return;
 
   const target =
-    item.offsetLeft - wheel.clientWidth / 2 + item.offsetWidth / 2;
+    item.offsetLeft -
+    ((wheel.clientWidth - item.offsetWidth) / 2);
 
   wheel.scrollTo({
     left: target,
