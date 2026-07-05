@@ -26,7 +26,7 @@ const liveries = [
   {
     id: "tiger",
     name: "Tiger",
-    labels: ["Primary", "Secondary"],
+    labels: ["Main", "Accent"],
     button: {
       active: "assets/swatches/liveries/tiger_active.png",
       idle: "assets/swatches/liveries/tiger_idle.png"
@@ -44,7 +44,7 @@ const liveries = [
   {
     id: "shock",
     name: "Shock",
-    labels: ["Primary", "Secondary", "Tertiary"],
+    labels: ["Main 1", "Main 2", "Accent"],
     button: {
       active: "assets/swatches/liveries/shock_active.png",
       idle: "assets/swatches/liveries/shock_idle.png"
@@ -256,7 +256,7 @@ function buildColorWheels() {
     block.innerHTML = `
       <div class="selector-label">${selector.label}</div>
       <div id="${selector.nameId}" class="selected-name">${selectedMaterial.name}</div>
-      <div id="${selector.metaId}" class="selected-meta">${selectedMaterial.style}</div>
+    
 
       <div class="wheel-arrow up">⌃</div>
 
