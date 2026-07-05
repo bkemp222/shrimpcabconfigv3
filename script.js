@@ -104,7 +104,8 @@ function getSelectorDefinitions() {
       label: "Livery",
       meta: "4x12",
       items: liveries,
-      type: "text"
+      type: "text",
+      live: false
     },
     {
       key: "bodyIndex",
@@ -274,9 +275,27 @@ function renderWheel({ wheelId, items, selectedIndex, onSelect, type = "swatch" 
       item.appendChild(chip);
     }
 
-    item.addEventListener("click", () => {
-      onSelect(index);
-    });
+wheel.addEventListener("scroll", () => {
+  if (type === "text" && wheelId === "liveryIndexWheel") {
+    return;
+  }
+
+  const liveIndex = getCenteredIndex(wheel);
+
+  if (liveIndex !== lastIndex) {
+    lastIndex = liveIndex;
+    onSelect(liveIndex);
+  }
+
+  clearTimeout(scrollTimer);
+
+  scrollTimer = setTimeout(() => {
+    const finalIndex = getCenteredIndex(wheel);
+    lastIndex = finalIndex;
+    onSelect(finalIndex);
+    scrollToIndex(wheel, finalIndex, "smooth");
+  }, 90);
+});
 
     wheel.appendChild(item);
   });
