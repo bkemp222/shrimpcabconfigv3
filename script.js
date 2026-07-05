@@ -27,16 +27,15 @@ const liveries = [
     id: "tiger",
     name: "Tiger",
     labels: ["Body", "Stripes"],
-        piping: {
-      black: `assets/${activeCab}/piping/tiger_black.png`,
-      white: `assets/${activeCab}/piping/tiger_white.png`
-    },
     layers: {
       body: `assets/${activeCab}/svg/tiger_body.svg`,
       accent: `assets/${activeCab}/svg/tiger_stripes.svg`,
       third: null
     },
-
+    piping: {
+      black: `assets/${activeCab}/piping/tiger_black.png`,
+      white: `assets/${activeCab}/piping/tiger_white.png`
+    }
   },
   {
     id: "nitro",
@@ -77,7 +76,7 @@ const grills = [
   { id: "oxblood", name: "Oxblood", file: `assets/${activeCab}/grills/oxblood.png` }
 ];
 
-const pipingOptions = [
+const trimOptions = [
   { id: "white", name: "White" },
   { id: "black", name: "Black" }
 ];
@@ -88,8 +87,126 @@ const state = {
   accentIndex: 6,
   thirdIndex: 3,
   grillIndex: 0,
+  grillPipingIndex: 0,
   pipingIndex: 0
 };
+
+function getCurrentLivery() {
+  return liveries[state.liveryIndex];
+}
+
+function getSelectorDefinitions() {
+  const livery = getCurrentLivery();
+
+  const selectors = [
+    {
+      key: "liveryIndex",
+      label: "Livery",
+      meta: "4x12",
+      items: liveries,
+      type: "text"
+    },
+    {
+      key: "bodyIndex",
+      label: livery.labels[0],
+      meta: materials[state.bodyIndex].style,
+      items: materials,
+      type: "swatch"
+    },
+    {
+      key: "accentIndex",
+      label: livery.labels[1],
+      meta: materials[state.accentIndex].style,
+      items: materials,
+      type: "swatch"
+    }
+  ];
+
+  if (livery.layers.third) {
+    selectors.push({
+      key: "thirdIndex",
+      label: livery.labels[2],
+      meta: materials[state.thirdIndex].style,
+      items: materials,
+      type: "swatch"
+    });
+  }
+
+  selectors.push(
+    {
+      key: "grillIndex",
+      label: "Grill",
+      meta: "Grill Cloth",
+      items: grills,
+      type: "text"
+    },
+    {
+      key: "grillPipingIndex",
+      label: "Grill Trim",
+      meta: "Trim",
+      items: trimOptions,
+      type: "text"
+    },
+    {
+      key: "pipingIndex",
+      label: "Cab Trim",
+      meta: "Trim",
+      items: trimOptions,
+      type: "text"
+    }
+  );
+
+  return selectors;
+}
+
+function buildSelectors() {
+  const card = document.getElementById("selectorsCard");
+  card.innerHTML = "";
+
+  getSelectorDefinitions().forEach(selector => {
+    const selectedItem = selector.items[state[selector.key]];
+
+    const block = document.createElement("div");
+    block.className = "selector-block";
+
+    block.innerHTML = `
+      <div class="selector-label">${selector.label}</div>
+      <div class="selected-name">${selectedItem.name}</div>
+      <div class="selected-meta">${selector.meta || ""}</div>
+
+      <div class="wheel-arrow up">⌃</div>
+
+      <div class="wheel-wrap">
+        <div class="wheel-zone"></div>
+        <div id="${selector.key}Wheel" class="wheel ${selector.type === "text" ? "text-wheel" : ""}"></div>
+      </div>
+
+      <div class="wheel-arrow down">⌄</div>
+    `;
+
+    card.appendChild(block);
+
+    renderWheel({
+      wheelId: `${selector.key}Wheel`,
+      items: selector.items,
+      selectedIndex: state[selector.key],
+      type: selector.type,
+      onSelect: async index => {
+        state[selector.key] = index;
+
+        if (selector.key === "liveryIndex") {
+          await updateLiveryAssets();
+          buildSelectors();
+          updateCabinet();
+          return;
+        }
+
+        updateCabinet();
+        buildSelectors();
+      }
+    });
+  });
+}
 
 async function loadSVG(layerId, path) {
   const layer = document.getElementById(layerId);
@@ -158,14 +275,16 @@ function renderWheel({ wheelId, items, selectedIndex, onSelect, type = "swatch" 
 
     item.addEventListener("click", () => {
       onSelect(index);
-      scrollToIndex(wheel, index);
     });
 
     wheel.appendChild(item);
   });
 
   updateWheelSelection(wheel, selectedIndex);
-  requestAnimationFrame(() => scrollToIndex(wheel, selectedIndex));
+
+  requestAnimationFrame(() => {
+    scrollToIndex(wheel, selectedIndex, "auto");
+  });
 
   let scrollTimer;
   let lastIndex = selectedIndex;
@@ -184,7 +303,7 @@ function renderWheel({ wheelId, items, selectedIndex, onSelect, type = "swatch" 
       const finalIndex = getCenteredIndex(wheel);
       lastIndex = finalIndex;
       onSelect(finalIndex);
-      scrollToIndex(wheel, finalIndex);
+      scrollToIndex(wheel, finalIndex, "smooth");
     }, 90);
   });
 }
@@ -210,13 +329,14 @@ function getCenteredIndex(wheel) {
   return closestIndex;
 }
 
-function scrollToIndex(wheel, index) {
+function scrollToIndex(wheel, index, behavior = "smooth") {
   const item = wheel.querySelectorAll(".wheel-item")[index];
+
   if (!item) return;
 
   item.scrollIntoView({
     block: "center",
-    behavior: "smooth"
+    behavior
   });
 }
 
@@ -227,138 +347,47 @@ function updateWheelSelection(wheel, selectedIndex) {
 }
 
 async function updateLiveryAssets() {
-  const livery = liveries[state.liveryIndex];
+  const livery = getCurrentLivery();
 
   await loadSVG("bodyLayer", livery.layers.body);
   await loadSVG("accentLayer", livery.layers.accent);
   await loadSVG("thirdLayer", livery.layers.third);
-
-  document.getElementById("thirdSelector").classList.toggle("hidden", !livery.layers.third);
-
-  document.getElementById("bodyLabel").textContent = livery.labels[0];
-  document.getElementById("accentLabel").textContent = livery.labels[1];
-
-  if (livery.labels[2]) {
-    document.getElementById("thirdLabel").textContent = livery.labels[2];
-  }
-
-  updateCabinet();
-}
-
-function updateSelectionText() {
-  const livery = liveries[state.liveryIndex];
-  const body = materials[state.bodyIndex];
-  const accent = materials[state.accentIndex];
-  const third = materials[state.thirdIndex];
-  const grill = grills[state.grillIndex];
-  const piping = pipingOptions[state.pipingIndex];
-
-  document.getElementById("liveryName").textContent = livery.name;
-
-  document.getElementById("bodyName").textContent = body.name;
-  document.getElementById("bodyMeta").textContent = body.style;
-
-  document.getElementById("accentName").textContent = accent.name;
-  document.getElementById("accentMeta").textContent = accent.style;
-
-  document.getElementById("thirdName").textContent = third.name;
-  document.getElementById("thirdMeta").textContent = third.style;
-
-  document.getElementById("grillName").textContent = grill.name;
-  document.getElementById("pipingName").textContent = piping.name;
 }
 
 function updateCabinet() {
-  const livery = liveries[state.liveryIndex];
+  const livery = getCurrentLivery();
+
   const body = materials[state.bodyIndex];
   const accent = materials[state.accentIndex];
   const third = materials[state.thirdIndex];
   const grill = grills[state.grillIndex];
-  const piping = pipingOptions[state.pipingIndex];
+  const grillTrim = trimOptions[state.grillPipingIndex];
+  const cabTrim = trimOptions[state.pipingIndex];
 
   setLayerColor("bodyLayer", body.color);
   setLayerColor("accentLayer", accent.color);
   setLayerColor("thirdLayer", third.color);
 
   document.getElementById("grillLayer").src = grill.file;
-  document.getElementById("pipingLayer").src = livery.piping[piping.id];
 
-  updateSelectionText();
+  document.getElementById("grillPipingLayer").src =
+    `assets/${activeCab}/piping/grill_${grillTrim.id}.png`;
 
-  updateWheelSelection(document.getElementById("liveryWheel"), state.liveryIndex);
-  updateWheelSelection(document.getElementById("bodyWheel"), state.bodyIndex);
-  updateWheelSelection(document.getElementById("accentWheel"), state.accentIndex);
-  updateWheelSelection(document.getElementById("thirdWheel"), state.thirdIndex);
-  updateWheelSelection(document.getElementById("grillWheel"), state.grillIndex);
-  updateWheelSelection(document.getElementById("pipingWheel"), state.pipingIndex);
+  document.getElementById("pipingLayer").src =
+    livery.piping[cabTrim.id];
+
+  getSelectorDefinitions().forEach(selector => {
+    const wheel = document.getElementById(`${selector.key}Wheel`);
+    if (wheel) {
+      updateWheelSelection(wheel, state[selector.key]);
+    }
+  });
 }
 
 async function init() {
-  renderWheel({
-    wheelId: "liveryWheel",
-    items: liveries,
-    selectedIndex: state.liveryIndex,
-    type: "text",
-    onSelect: async index => {
-      if (state.liveryIndex === index) return;
-      state.liveryIndex = index;
-      await updateLiveryAssets();
-    }
-  });
-
-  renderWheel({
-    wheelId: "bodyWheel",
-    items: materials,
-    selectedIndex: state.bodyIndex,
-    onSelect: index => {
-      state.bodyIndex = index;
-      updateCabinet();
-    }
-  });
-
-  renderWheel({
-    wheelId: "accentWheel",
-    items: materials,
-    selectedIndex: state.accentIndex,
-    onSelect: index => {
-      state.accentIndex = index;
-      updateCabinet();
-    }
-  });
-
-  renderWheel({
-    wheelId: "thirdWheel",
-    items: materials,
-    selectedIndex: state.thirdIndex,
-    onSelect: index => {
-      state.thirdIndex = index;
-      updateCabinet();
-    }
-  });
-
-  renderWheel({
-    wheelId: "grillWheel",
-    items: grills,
-    selectedIndex: state.grillIndex,
-    type: "text",
-    onSelect: index => {
-      state.grillIndex = index;
-      updateCabinet();
-    }
-  });
-
-  renderWheel({
-    wheelId: "pipingWheel",
-    items: pipingOptions,
-    selectedIndex: state.pipingIndex,
-    type: "text",
-    onSelect: index => {
-      state.pipingIndex = index;
-      updateCabinet();
-    }
-  });
-
   await updateLiveryAssets();
+  buildSelectors();
+  updateCabinet();
 }
 
 init();

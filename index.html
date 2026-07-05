@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shrimp Config V2 — 4x12</title>
+  <title>Shrimp Config V2</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -11,7 +11,7 @@
   <main class="app">
     <header class="topbar">
       <p class="eyebrow">Shrimp Cab Co.</p>
-      <h1>2x12 Vertical Configurator</h1>
+      <h1>4x12 Configurator</h1>
     </header>
 
     <section class="preview-card">
@@ -23,83 +23,12 @@
         <div id="thirdLayer" class="layer svg-layer"></div>
 
         <img id="grillLayer" class="layer grill-layer" src="" />
+        <img id="grillPipingLayer" class="layer grill-piping-layer" src="" />
         <img id="pipingLayer" class="layer piping-layer" src="" />
       </div>
     </section>
 
-    <section class="selectors-card">
-      <div class="selector-block">
-        <div class="selector-label">Livery</div>
-        <div id="liveryName" class="selected-name">Tiger</div>
-        <div class="selected-meta">2x12 Vertical</div>
-        <div class="wheel-arrow up">⌃</div>
-        <div class="wheel-wrap">
-          <div class="wheel-zone"></div>
-          <div id="liveryWheel" class="wheel text-wheel"></div>
-        </div>
-        <div class="wheel-arrow down">⌄</div>
-      </div>
-
-      <div class="selector-block">
-        <div id="bodyLabel" class="selector-label">Body</div>
-        <div id="bodyName" class="selected-name">Black</div>
-        <div id="bodyMeta" class="selected-meta">Levant</div>
-        <div class="wheel-arrow up">⌃</div>
-        <div class="wheel-wrap">
-          <div class="wheel-zone"></div>
-          <div id="bodyWheel" class="wheel"></div>
-        </div>
-        <div class="wheel-arrow down">⌄</div>
-      </div>
-
-      <div class="selector-block">
-        <div id="accentLabel" class="selector-label">Accent</div>
-        <div id="accentName" class="selected-name">Gold</div>
-        <div id="accentMeta" class="selected-meta">Levant</div>
-        <div class="wheel-arrow up">⌃</div>
-        <div class="wheel-wrap">
-          <div class="wheel-zone"></div>
-          <div id="accentWheel" class="wheel"></div>
-        </div>
-        <div class="wheel-arrow down">⌄</div>
-      </div>
-
-      <div id="thirdSelector" class="selector-block hidden">
-        <div id="thirdLabel" class="selector-label">Bolt</div>
-        <div id="thirdName" class="selected-name">White</div>
-        <div id="thirdMeta" class="selected-meta">Levant</div>
-        <div class="wheel-arrow up">⌃</div>
-        <div class="wheel-wrap">
-          <div class="wheel-zone"></div>
-          <div id="thirdWheel" class="wheel"></div>
-        </div>
-        <div class="wheel-arrow down">⌄</div>
-      </div>
-
-      <div class="selector-block">
-        <div class="selector-label">Grill</div>
-        <div id="grillName" class="selected-name">Black Basket</div>
-        <div class="selected-meta">Grill Cloth</div>
-        <div class="wheel-arrow up">⌃</div>
-        <div class="wheel-wrap">
-          <div class="wheel-zone"></div>
-          <div id="grillWheel" class="wheel text-wheel"></div>
-        </div>
-        <div class="wheel-arrow down">⌄</div>
-      </div>
-
-      <div class="selector-block">
-        <div class="selector-label">Piping</div>
-        <div id="pipingName" class="selected-name">White</div>
-        <div class="selected-meta">Trim</div>
-        <div class="wheel-arrow up">⌃</div>
-        <div class="wheel-wrap short">
-          <div class="wheel-zone"></div>
-          <div id="pipingWheel" class="wheel text-wheel"></div>
-        </div>
-        <div class="wheel-arrow down">⌄</div>
-      </div>
-    </section>
+    <section id="selectorsCard" class="selectors-card"></section>
   </main>
 
   <script src="script.js"></script>

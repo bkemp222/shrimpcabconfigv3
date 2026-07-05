@@ -89,8 +89,12 @@ h1 {
   z-index: 5;
 }
 
-.piping-layer {
+.grill-piping-layer {
   z-index: 6;
+}
+
+.piping-layer {
+  z-index: 7;
 }
 
 .selectors-card {
@@ -117,10 +121,6 @@ h1 {
   flex-direction: column;
   align-items: center;
   text-align: center;
-}
-
-.selector-block.hidden {
-  display: none;
 }
 
 .selector-label {
@@ -174,10 +174,6 @@ h1 {
   place-items: center;
 }
 
-.wheel-wrap.short {
-  height: 112px;
-}
-
 .wheel-zone {
   position: absolute;
   width: 80px;
@@ -198,6 +194,7 @@ h1 {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   background: transparent;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -234,15 +231,18 @@ h1 {
   height: 56px;
   flex: 0 0 56px;
   scroll-snap-align: center;
+
   display: flex;
   justify-content: center;
   align-items: center;
+
   opacity: 0.16;
   transform: scale(0.82);
   transition:
     opacity 160ms ease,
     transform 160ms ease,
     filter 160ms ease;
+
   background: transparent;
   border: 0;
   padding: 0;
