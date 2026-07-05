@@ -258,9 +258,9 @@ h1 {
 }
 
 .wheel-item {
-  width: 116px;
-  height: 56px;
-  flex: 0 0 56px;
+  width: 60px;
+  height: 30px;
+  flex: 0 0 30px;
   scroll-snap-align: center;
 
   display: flex;
@@ -291,8 +291,8 @@ h1 {
 
 .swatch {
   display: block;
-  width: 56px;
-  height: 56px;
+  width: 30px;
+  height: 30px;
   margin: 0 auto;
   object-fit: contain;
   border: 0;
