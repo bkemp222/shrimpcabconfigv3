@@ -217,8 +217,8 @@ h1 {
 
 .wheel {
   position: relative;
-  width: 116px;
-  height: 112px;
+  width: 60px;
+  height: 60px;
   overflow-y: auto;
   overflow-x: hidden;
   scroll-snap-type: y mandatory;
