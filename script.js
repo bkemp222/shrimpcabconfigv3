@@ -321,6 +321,10 @@ function renderColorWheel(wheelId, selectedIndex, onSelect) {
   const wheel = document.getElementById(wheelId);
   wheel.innerHTML = "";
 
+  let isProgrammaticScroll = false;
+  let scrollTimer;
+  let lastIndex = selectedIndex;
+
   materials.forEach((material, index) => {
     const button = document.createElement("button");
     button.className = "color-item";
@@ -330,8 +334,14 @@ function renderColorWheel(wheelId, selectedIndex, onSelect) {
     button.innerHTML = `<img src="${material.swatch}" alt="${material.name}">`;
 
     button.addEventListener("click", () => {
+      isProgrammaticScroll = true;
       onSelect(index);
       scrollColorWheelToIndex(wheel, index, "smooth");
+
+      setTimeout(() => {
+        isProgrammaticScroll = false;
+        lastIndex = index;
+      }, 350);
     });
 
     wheel.appendChild(button);
@@ -340,13 +350,18 @@ function renderColorWheel(wheelId, selectedIndex, onSelect) {
   updateWheelSelection(wheel, selectedIndex);
 
   requestAnimationFrame(() => {
+    isProgrammaticScroll = true;
     scrollColorWheelToIndex(wheel, selectedIndex, "auto");
+
+    setTimeout(() => {
+      isProgrammaticScroll = false;
+      lastIndex = selectedIndex;
+    }, 100);
   });
 
-  let scrollTimer;
-  let lastIndex = selectedIndex;
-
   wheel.addEventListener("scroll", () => {
+    if (isProgrammaticScroll) return;
+
     const liveIndex = getCenteredColorIndex(wheel);
 
     if (liveIndex !== lastIndex) {
@@ -355,12 +370,19 @@ function renderColorWheel(wheelId, selectedIndex, onSelect) {
     }
 
     clearTimeout(scrollTimer);
+
     scrollTimer = setTimeout(() => {
       const finalIndex = getCenteredColorIndex(wheel);
       lastIndex = finalIndex;
+
+      isProgrammaticScroll = true;
       onSelect(finalIndex);
       scrollColorWheelToIndex(wheel, finalIndex, "smooth");
-    }, 90);
+
+      setTimeout(() => {
+        isProgrammaticScroll = false;
+      }, 350);
+    }, 120);
   });
 }
 
