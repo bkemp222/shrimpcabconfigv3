@@ -130,10 +130,12 @@ h1 {
 }
 
 .color-wheels {
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
-  gap: clamp(16px, 5vw, 34px);
+  gap: 8px;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
