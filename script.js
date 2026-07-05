@@ -27,15 +27,16 @@ const liveries = [
     id: "tiger",
     name: "Tiger",
     labels: ["Body", "Stripes"],
+        piping: {
+      black: `assets/${activeCab}/piping/tiger_black.png`,
+      white: `assets/${activeCab}/piping/tiger_white.png`
+    },
     layers: {
       body: `assets/${activeCab}/svg/tiger_body.svg`,
       accent: `assets/${activeCab}/svg/tiger_stripes.svg`,
       third: null
     },
-    piping: {
-      black: `assets/${activeCab}/piping/tiger_black.png`,
-      white: `assets/${activeCab}/piping/tiger_white.png`
-    }
+
   },
   {
     id: "nitro",
