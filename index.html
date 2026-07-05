@@ -3,20 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shrimp Config V2</title>
+  <title>Shrimp Configurator V2</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <main class="app">
-    <header class="topbar">
-      <p class="eyebrow">Shrimp Cab Co.</p>
-      <h1>4x12 Configurator</h1>
-    </header>
-
     <section class="preview-card">
+      <div id="sizeButtons" class="size-buttons"></div>
+
       <div id="cabinet">
-        <img class="layer base" src="assets/412/base/base.png" />
+        <img id="baseLayer" class="layer base" src="assets/412/base/base.png" />
 
         <div id="bodyLayer" class="layer svg-layer"></div>
         <div id="accentLayer" class="layer svg-layer"></div>
@@ -28,36 +25,30 @@
       </div>
     </section>
 
-<section class="controls">
-  <div class="livery-row">
-    <div class="section-label big">Livery</div>
-    <div id="liveryButtons" class="livery-buttons"></div>
-  </div>
-
-  <div class="control-grid">
-    <div class="tolex-panel">
-      <div class="section-label big">Tolex</div>
-      <div id="colorWheels" class="color-wheels"></div>
-    </div>
-
-    <div class="grill-panel">
-      <div class="button-section">
-        <div class="section-label big">Grill Cloth</div>
-        <div id="grillButtons" class="swatch-buttons"></div>
+    <section class="controls">
+      <div class="livery-row">
+        <div class="section-title">Livery</div>
+        <div id="liveryButtons" class="livery-buttons"></div>
       </div>
 
-      <div class="button-section">
-        <div class="section-label big">Grill Trim</div>
-        <div id="grillTrimButtons" class="text-buttons"></div>
-      </div>
+      <div class="control-grid">
+        <div class="tolex-panel">
+          <div class="section-title">Tolex</div>
+          <div id="colorWheels" class="color-wheels"></div>
+        </div>
 
-      <div class="button-section">
-        <div class="section-label big">Cabinet Trim</div>
-        <div id="cabTrimButtons" class="text-buttons"></div>
+        <div class="grill-panel">
+          <div class="section-title">Grill Cloth</div>
+          <div id="grillButtons" class="grill-buttons"></div>
+          <div id="grillName" class="selected-grill-name">Black Basketweave</div>
+
+          <div class="trim-section">
+            <div class="section-title">Grill Trim</div>
+            <div id="grillTrimButtons" class="trim-buttons"></div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
   </main>
 
   <script src="script.js"></script>
