@@ -191,19 +191,20 @@ function buildSelectors() {
       items: selector.items,
       selectedIndex: state[selector.key],
       type: selector.type,
-      onSelect: async index => {
-        state[selector.key] = index;
+onSelect: async index => {
+  if (state[selector.key] === index) return;
 
-        if (selector.key === "liveryIndex") {
-          await updateLiveryAssets();
-          buildSelectors();
-          updateCabinet();
-          return;
-        }
+  state[selector.key] = index;
 
-        updateCabinet();
-        buildSelectors();
-      }
+  if (selector.key === "liveryIndex") {
+    await updateLiveryAssets();
+    buildSelectors();
+    updateCabinet();
+    return;
+  }
+
+  updateCabinet();
+}
     });
   });
 }
