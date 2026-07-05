@@ -1,4 +1,4 @@
-const activeCab = "212v";
+const activeCab = "412";
 
 const materials = [
   { id: "black", name: "Black", style: "Levant", color: "#222222", swatch: "assets/swatches/colors/black.png" },
