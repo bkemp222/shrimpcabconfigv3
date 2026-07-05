@@ -199,7 +199,7 @@ h1 {
 
 .wheel-wrap {
   position: relative;
-  width: 40px;
+  width: 60px;
   height: 60px;
   display: grid;
   place-items: center;
