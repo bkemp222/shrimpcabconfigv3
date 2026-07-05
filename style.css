@@ -14,7 +14,7 @@ body {
   padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .topbar {
@@ -32,13 +32,6 @@ body {
 h1 {
   margin: 0;
   font-size: clamp(1.2rem, 5vw, 2.3rem);
-}
-
-.preview-card,
-.selectors-card {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
 }
 
 .preview-card {
@@ -97,24 +90,59 @@ h1 {
   z-index: 7;
 }
 
-.selectors-card {
+/* CONTROLS */
+
+.controls {
   width: 100%;
-  padding: 4px 0 20px;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 18px;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.livery-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+}
+
+.livery-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.livery-btn img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  display: block;
+  transition:
+    transform 160ms ease,
+    filter 160ms ease;
+}
+
+.livery-btn.active img {
+  transform: scale(1.08);
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.16));
+}
+
+.color-wheels {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: clamp(16px, 5vw, 34px);
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 
-.selectors-card::-webkit-scrollbar {
+.color-wheels::-webkit-scrollbar {
   display: none;
 }
 
-.selector-block {
+.color-selector {
   width: 124px;
   flex: 0 0 124px;
   display: flex;
@@ -123,12 +151,14 @@ h1 {
   text-align: center;
 }
 
-.selector-label {
+.selector-label,
+.section-label {
   color: #161616;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .selected-name {
@@ -246,8 +276,6 @@ h1 {
   background: transparent;
   border: 0;
   padding: 0;
-  color: #161616;
-  font: inherit;
 }
 
 .wheel-item.selected {
@@ -272,17 +300,82 @@ h1 {
   box-shadow: none;
 }
 
-.text-chip {
-  min-width: 78px;
+/* BUTTON SECTIONS */
+
+.button-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.swatch-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.swatch-buttons::-webkit-scrollbar {
+  display: none;
+}
+
+.grill-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.55;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    filter 160ms ease;
+}
+
+.grill-btn.active {
+  opacity: 1;
+  transform: scale(1.08);
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.16));
+}
+
+.grill-btn img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+}
+
+.text-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.text-btn {
+  min-width: 82px;
   min-height: 38px;
-  padding: 7px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
   border-radius: 999px;
-  display: grid;
-  place-items: center;
+  background: rgba(255, 255, 255, 0.35);
+  color: #161616;
   font-size: 0.82rem;
   font-weight: 900;
-  line-height: 1;
-  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.text-btn.active {
+  background: #ff6f55;
+  color: white;
+  border-color: #ff6f55;
+  transform: scale(1.04);
 }
 
 @keyframes swatch-breathe {
@@ -302,9 +395,17 @@ h1 {
     padding: 30px;
   }
 
-  .selectors-card {
-    justify-content: center;
-    flex-wrap: wrap;
+  .livery-btn img {
+    width: 68px;
+    height: 68px;
+  }
+
+  .color-wheels {
     overflow: visible;
+  }
+
+  .grill-btn img {
+    width: 56px;
+    height: 56px;
   }
 }

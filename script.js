@@ -26,7 +26,11 @@ const liveries = [
   {
     id: "tiger",
     name: "Tiger",
-    labels: ["Body", "Stripes"],
+    labels: ["Primary", "Secondary"],
+    button: {
+      active: "assets/swatches/liveries/tiger_active.png",
+      idle: "assets/swatches/liveries/tiger_idle.png"
+    },
     layers: {
       body: `assets/${activeCab}/svg/tiger_body.svg`,
       accent: `assets/${activeCab}/svg/tiger_stripes.svg`,
@@ -38,23 +42,13 @@ const liveries = [
     }
   },
   {
-    id: "nitro",
-    name: "Nitro",
-    labels: ["Body", "Flames"],
-    layers: {
-      body: `assets/${activeCab}/svg/nitro_body.svg`,
-      accent: `assets/${activeCab}/svg/nitro_flames.svg`,
-      third: null
-    },
-    piping: {
-      black: `assets/${activeCab}/piping/nitro_black.png`,
-      white: `assets/${activeCab}/piping/nitro_white.png`
-    }
-  },
-  {
     id: "shock",
     name: "Shock",
-    labels: ["Top", "Bottom", "Bolt"],
+    labels: ["Primary", "Secondary", "Tertiary"],
+    button: {
+      active: "assets/swatches/liveries/shock_active.png",
+      idle: "assets/swatches/liveries/shock_idle.png"
+    },
     layers: {
       body: `assets/${activeCab}/svg/shock_top.svg`,
       accent: `assets/${activeCab}/svg/shock_bottom.svg`,
@@ -64,16 +58,34 @@ const liveries = [
       black: `assets/${activeCab}/piping/shock_black.png`,
       white: `assets/${activeCab}/piping/shock_white.png`
     }
+  },
+  {
+    id: "nitro",
+    name: "Nitro",
+    labels: ["Primary", "Secondary"],
+    button: {
+      active: "assets/swatches/liveries/nitro_active.png",
+      idle: "assets/swatches/liveries/nitro_idle.png"
+    },
+    layers: {
+      body: `assets/${activeCab}/svg/nitro_body.svg`,
+      accent: `assets/${activeCab}/svg/nitro_flames.svg`,
+      third: null
+    },
+    piping: {
+      black: `assets/${activeCab}/piping/nitro_black.png`,
+      white: `assets/${activeCab}/piping/nitro_white.png`
+    }
   }
 ];
 
 const grills = [
-  { id: "blackbasket", name: "Black Basket", file: `assets/${activeCab}/grills/blackbasket.png` },
-  { id: "saltpepper", name: "Salt & Pepper", file: `assets/${activeCab}/grills/saltpepper.png` },
-  { id: "smallcane", name: "Small Cane", file: `assets/${activeCab}/grills/smallcane.png` },
-  { id: "agedsilver", name: "Aged Silver", file: `assets/${activeCab}/grills/agedsilver.png` },
-  { id: "fendersilver", name: "Fender Silver", file: `assets/${activeCab}/grills/fendersilver.png` },
-  { id: "oxblood", name: "Oxblood", file: `assets/${activeCab}/grills/oxblood.png` }
+  { id: "blackbasket", name: "Black Basket", file: `assets/${activeCab}/grills/blackbasket.png`, swatch: "assets/swatches/grills/blackbasket.png" },
+  { id: "saltpepper", name: "Salt & Pepper", file: `assets/${activeCab}/grills/saltpepper.png`, swatch: "assets/swatches/grills/saltpepper.png" },
+  { id: "smallcane", name: "Small Cane", file: `assets/${activeCab}/grills/smallcane.png`, swatch: "assets/swatches/grills/smallcane.png" },
+  { id: "agedsilver", name: "Aged Silver", file: `assets/${activeCab}/grills/agedsilver.png`, swatch: "assets/swatches/grills/agedsilver.png" },
+  { id: "fendersilver", name: "Fender Silver", file: `assets/${activeCab}/grills/fendersilver.png`, swatch: "assets/swatches/grills/fendersilver.png" },
+  { id: "oxblood", name: "Oxblood", file: `assets/${activeCab}/grills/oxblood.png`, swatch: "assets/swatches/grills/oxblood.png" }
 ];
 
 const trimOptions = [
@@ -91,123 +103,8 @@ const state = {
   pipingIndex: 0
 };
 
-function getCurrentLivery() {
+function currentLivery() {
   return liveries[state.liveryIndex];
-}
-
-function getSelectorDefinitions() {
-  const livery = getCurrentLivery();
-
-  const selectors = [
-    {
-      key: "liveryIndex",
-      label: "Livery",
-      meta: "4x12",
-      items: liveries,
-      type: "text",
-      live: false
-    },
-    {
-      key: "bodyIndex",
-      label: livery.labels[0],
-      meta: materials[state.bodyIndex].style,
-      items: materials,
-      type: "swatch"
-    },
-    {
-      key: "accentIndex",
-      label: livery.labels[1],
-      meta: materials[state.accentIndex].style,
-      items: materials,
-      type: "swatch"
-    }
-  ];
-
-  if (livery.layers.third) {
-    selectors.push({
-      key: "thirdIndex",
-      label: livery.labels[2],
-      meta: materials[state.thirdIndex].style,
-      items: materials,
-      type: "swatch"
-    });
-  }
-
-  selectors.push(
-    {
-      key: "grillIndex",
-      label: "Grill",
-      meta: "Grill Cloth",
-      items: grills,
-      type: "text"
-    },
-    {
-      key: "grillPipingIndex",
-      label: "Grill Trim",
-      meta: "Trim",
-      items: trimOptions,
-      type: "text"
-    },
-    {
-      key: "pipingIndex",
-      label: "Cab Trim",
-      meta: "Trim",
-      items: trimOptions,
-      type: "text"
-    }
-  );
-
-  return selectors;
-}
-
-function buildSelectors() {
-  const card = document.getElementById("selectorsCard");
-  card.innerHTML = "";
-
-  getSelectorDefinitions().forEach(selector => {
-    const selectedItem = selector.items[state[selector.key]];
-
-    const block = document.createElement("div");
-    block.className = "selector-block";
-
-    block.innerHTML = `
-      <div class="selector-label">${selector.label}</div>
-      <div class="selected-name">${selectedItem.name}</div>
-      <div class="selected-meta">${selector.meta || ""}</div>
-
-      <div class="wheel-arrow up">⌃</div>
-
-      <div class="wheel-wrap">
-        <div class="wheel-zone"></div>
-        <div id="${selector.key}Wheel" class="wheel ${selector.type === "text" ? "text-wheel" : ""}"></div>
-      </div>
-
-      <div class="wheel-arrow down">⌄</div>
-    `;
-
-    card.appendChild(block);
-
-    renderWheel({
-      wheelId: `${selector.key}Wheel`,
-      items: selector.items,
-      selectedIndex: state[selector.key],
-      type: selector.type,
-onSelect: async index => {
-  if (state[selector.key] === index) return;
-
-  state[selector.key] = index;
-
-  if (selector.key === "liveryIndex") {
-    await updateLiveryAssets();
-    buildSelectors();
-    updateCabinet();
-    return;
-  }
-
-  updateCabinet();
-}
-    });
-  });
 }
 
 async function loadSVG(layerId, path) {
@@ -251,51 +148,149 @@ function setLayerColor(layerId, color) {
   });
 }
 
-function renderWheel({ wheelId, items, selectedIndex, onSelect, type = "swatch" }) {
+async function updateLiveryAssets() {
+  const livery = currentLivery();
+
+  await loadSVG("bodyLayer", livery.layers.body);
+  await loadSVG("accentLayer", livery.layers.accent);
+  await loadSVG("thirdLayer", livery.layers.third);
+}
+
+function updateCabinet() {
+  const livery = currentLivery();
+
+  const body = materials[state.bodyIndex];
+  const accent = materials[state.accentIndex];
+  const third = materials[state.thirdIndex];
+  const grill = grills[state.grillIndex];
+  const grillTrim = trimOptions[state.grillPipingIndex];
+  const cabTrim = trimOptions[state.pipingIndex];
+
+  setLayerColor("bodyLayer", body.color);
+  setLayerColor("accentLayer", accent.color);
+  setLayerColor("thirdLayer", third.color);
+
+  document.getElementById("grillLayer").src = grill.file;
+
+  document.getElementById("grillPipingLayer").src =
+    `assets/${activeCab}/piping/grill_${grillTrim.id}.png`;
+
+  document.getElementById("pipingLayer").src =
+    livery.piping[cabTrim.id];
+
+  updateColorLabels();
+  updateButtons();
+}
+
+function buildLiveryButtons() {
+  const container = document.getElementById("liveryButtons");
+  container.innerHTML = "";
+
+  liveries.forEach((livery, index) => {
+    const button = document.createElement("button");
+    button.className = "livery-btn";
+    button.type = "button";
+    button.setAttribute("aria-label", livery.name);
+
+    button.innerHTML = `
+      <img src="${index === state.liveryIndex ? livery.button.active : livery.button.idle}" alt="${livery.name}">
+    `;
+
+    button.addEventListener("click", async () => {
+      if (state.liveryIndex === index) return;
+
+      state.liveryIndex = index;
+
+      await updateLiveryAssets();
+      buildColorWheels();
+      updateCabinet();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+function buildColorWheels() {
+  const container = document.getElementById("colorWheels");
+  const livery = currentLivery();
+
+  container.innerHTML = "";
+
+  const selectors = [
+    {
+      key: "bodyIndex",
+      label: livery.labels[0],
+      nameId: "bodyName",
+      metaId: "bodyMeta"
+    },
+    {
+      key: "accentIndex",
+      label: livery.labels[1],
+      nameId: "accentName",
+      metaId: "accentMeta"
+    }
+  ];
+
+  if (livery.layers.third) {
+    selectors.push({
+      key: "thirdIndex",
+      label: livery.labels[2],
+      nameId: "thirdName",
+      metaId: "thirdMeta"
+    });
+  }
+
+  selectors.forEach(selector => {
+    const selectedMaterial = materials[state[selector.key]];
+
+    const block = document.createElement("div");
+    block.className = "color-selector";
+
+    block.innerHTML = `
+      <div class="selector-label">${selector.label}</div>
+      <div id="${selector.nameId}" class="selected-name">${selectedMaterial.name}</div>
+      <div id="${selector.metaId}" class="selected-meta">${selectedMaterial.style}</div>
+
+      <div class="wheel-arrow up">⌃</div>
+
+      <div class="wheel-wrap">
+        <div class="wheel-zone"></div>
+        <div id="${selector.key}Wheel" class="wheel"></div>
+      </div>
+
+      <div class="wheel-arrow down">⌄</div>
+    `;
+
+    container.appendChild(block);
+
+    renderColorWheel(`${selector.key}Wheel`, state[selector.key], index => {
+      state[selector.key] = index;
+      updateCabinet();
+    });
+  });
+}
+
+function renderColorWheel(wheelId, selectedIndex, onSelect) {
   const wheel = document.getElementById(wheelId);
   wheel.innerHTML = "";
 
-  items.forEach((itemData, index) => {
+  materials.forEach((material, index) => {
     const item = document.createElement("button");
     item.className = "wheel-item";
     item.type = "button";
-    item.dataset.index = index;
-    item.setAttribute("aria-label", itemData.name);
+    item.setAttribute("aria-label", material.name);
 
-    if (type === "swatch") {
-      const img = document.createElement("img");
-      img.className = "swatch";
-      img.src = itemData.swatch;
-      img.alt = itemData.name;
-      item.appendChild(img);
-    } else {
-      const chip = document.createElement("div");
-      chip.className = "text-chip";
-      chip.textContent = itemData.name;
-      item.appendChild(chip);
-    }
+    const img = document.createElement("img");
+    img.className = "swatch";
+    img.src = material.swatch;
+    img.alt = material.name;
 
-wheel.addEventListener("scroll", () => {
-  if (type === "text" && wheelId === "liveryIndexWheel") {
-    return;
-  }
+    item.appendChild(img);
 
-  const liveIndex = getCenteredIndex(wheel);
-
-  if (liveIndex !== lastIndex) {
-    lastIndex = liveIndex;
-    onSelect(liveIndex);
-  }
-
-  clearTimeout(scrollTimer);
-
-  scrollTimer = setTimeout(() => {
-    const finalIndex = getCenteredIndex(wheel);
-    lastIndex = finalIndex;
-    onSelect(finalIndex);
-    scrollToIndex(wheel, finalIndex, "smooth");
-  }, 90);
-});
+    item.addEventListener("click", () => {
+      onSelect(index);
+      scrollToIndex(wheel, index, "smooth");
+    });
 
     wheel.appendChild(item);
   });
@@ -324,7 +319,7 @@ wheel.addEventListener("scroll", () => {
       lastIndex = finalIndex;
       onSelect(finalIndex);
       scrollToIndex(wheel, finalIndex, "smooth");
-    }, 90);
+    }, 100);
   });
 }
 
@@ -366,47 +361,107 @@ function updateWheelSelection(wheel, selectedIndex) {
   });
 }
 
-async function updateLiveryAssets() {
-  const livery = getCurrentLivery();
-
-  await loadSVG("bodyLayer", livery.layers.body);
-  await loadSVG("accentLayer", livery.layers.accent);
-  await loadSVG("thirdLayer", livery.layers.third);
-}
-
-function updateCabinet() {
-  const livery = getCurrentLivery();
-
+function updateColorLabels() {
   const body = materials[state.bodyIndex];
   const accent = materials[state.accentIndex];
   const third = materials[state.thirdIndex];
-  const grill = grills[state.grillIndex];
-  const grillTrim = trimOptions[state.grillPipingIndex];
-  const cabTrim = trimOptions[state.pipingIndex];
 
-  setLayerColor("bodyLayer", body.color);
-  setLayerColor("accentLayer", accent.color);
-  setLayerColor("thirdLayer", third.color);
+  const bodyName = document.getElementById("bodyName");
+  const accentName = document.getElementById("accentName");
+  const thirdName = document.getElementById("thirdName");
 
-  document.getElementById("grillLayer").src = grill.file;
+  if (bodyName) bodyName.textContent = body.name;
+  if (accentName) accentName.textContent = accent.name;
+  if (thirdName) thirdName.textContent = third.name;
 
-  document.getElementById("grillPipingLayer").src =
-    `assets/${activeCab}/piping/grill_${grillTrim.id}.png`;
+  const bodyMeta = document.getElementById("bodyMeta");
+  const accentMeta = document.getElementById("accentMeta");
+  const thirdMeta = document.getElementById("thirdMeta");
 
-  document.getElementById("pipingLayer").src =
-    livery.piping[cabTrim.id];
+  if (bodyMeta) bodyMeta.textContent = body.style;
+  if (accentMeta) accentMeta.textContent = accent.style;
+  if (thirdMeta) thirdMeta.textContent = third.style;
 
-  getSelectorDefinitions().forEach(selector => {
-    const wheel = document.getElementById(`${selector.key}Wheel`);
-    if (wheel) {
-      updateWheelSelection(wheel, state[selector.key]);
-    }
+  ["bodyIndex", "accentIndex", "thirdIndex"].forEach(key => {
+    const wheel = document.getElementById(`${key}Wheel`);
+    if (wheel) updateWheelSelection(wheel, state[key]);
+  });
+}
+
+function buildGrillButtons() {
+  const container = document.getElementById("grillButtons");
+  container.innerHTML = "";
+
+  grills.forEach((grill, index) => {
+    const button = document.createElement("button");
+    button.className = "grill-btn";
+    button.type = "button";
+    button.setAttribute("aria-label", grill.name);
+
+    button.innerHTML = `<img src="${grill.swatch}" alt="${grill.name}">`;
+
+    button.addEventListener("click", () => {
+      state.grillIndex = index;
+      updateCabinet();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+function buildTrimButtons(containerId, stateKey) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  trimOptions.forEach((option, index) => {
+    const button = document.createElement("button");
+    button.className = "text-btn";
+    button.type = "button";
+    button.textContent = option.name;
+
+    button.addEventListener("click", () => {
+      state[stateKey] = index;
+      updateCabinet();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+function updateButtons() {
+  document.querySelectorAll(".livery-btn").forEach((button, index) => {
+    const img = button.querySelector("img");
+    const livery = liveries[index];
+
+    button.classList.toggle("active", index === state.liveryIndex);
+    img.src = index === state.liveryIndex ? livery.button.active : livery.button.idle;
+  });
+
+  document.querySelectorAll(".grill-btn").forEach((button, index) => {
+    button.classList.toggle("active", index === state.grillIndex);
+  });
+
+  updateTextButtonGroup("grillTrimButtons", state.grillPipingIndex);
+  updateTextButtonGroup("cabTrimButtons", state.pipingIndex);
+}
+
+function updateTextButtonGroup(containerId, activeIndex) {
+  const container = document.getElementById(containerId);
+
+  container.querySelectorAll(".text-btn").forEach((button, index) => {
+    button.classList.toggle("active", index === activeIndex);
   });
 }
 
 async function init() {
+  buildLiveryButtons();
+  buildColorWheels();
+  buildGrillButtons();
+
+  buildTrimButtons("grillTrimButtons", "grillPipingIndex");
+  buildTrimButtons("cabTrimButtons", "pipingIndex");
+
   await updateLiveryAssets();
-  buildSelectors();
   updateCabinet();
 }
 
