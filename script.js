@@ -196,15 +196,22 @@ function buildLiveryButtons() {
       <img src="${index === state.liveryIndex ? livery.button.active : livery.button.idle}" alt="${livery.name}">
     `;
 
-    button.addEventListener("click", async () => {
-      if (state.liveryIndex === index) return;
+button.addEventListener("click", async () => {
+  if (state.liveryIndex === index) return;
 
-      state.liveryIndex = index;
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
 
-      await updateLiveryAssets();
-      buildColorWheels();
-      updateCabinet();
-    });
+  state.liveryIndex = index;
+
+  await updateLiveryAssets();
+  buildColorWheels();
+  updateCabinet();
+
+  requestAnimationFrame(() => {
+    window.scrollTo(scrollX, scrollY);
+  });
+});
 
     container.appendChild(button);
   });
