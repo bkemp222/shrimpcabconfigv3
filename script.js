@@ -356,8 +356,15 @@ function scrollToIndex(wheel, index, behavior = "smooth") {
 
   if (!item) return;
 
-  item.scrollIntoView({
-    block: "center",
+  const itemTop = item.offsetTop;
+  const itemHeight = item.offsetHeight;
+  const wheelHeight = wheel.clientHeight;
+
+  const targetScroll =
+    itemTop - (wheelHeight / 2) + (itemHeight / 2);
+
+  wheel.scrollTo({
+    top: targetScroll,
     behavior
   });
 }
