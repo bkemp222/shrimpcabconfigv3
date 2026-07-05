@@ -11,7 +11,7 @@ body {
 
 .app {
   min-height: 100vh;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -31,7 +31,7 @@ body {
 
 h1 {
   margin: 0;
-  font-size: clamp(1.3rem, 6vw, 2.4rem);
+  font-size: clamp(1.2rem, 5vw, 2.3rem);
 }
 
 .preview-card,
@@ -57,87 +57,89 @@ h1 {
   inset: 0;
   width: 100%;
   height: auto;
+  pointer-events: none;
 }
 
 .base {
   position: relative;
-  z-index: 1;
   display: block;
+  z-index: 1;
 }
 
-.color-layer {
+.svg-layer {
   z-index: 2;
   mix-blend-mode: multiply;
 }
 
-.stripe-layer {
+#accentLayer {
   z-index: 3;
 }
 
-.color-layer svg {
+#thirdLayer {
+  z-index: 4;
+}
+
+.svg-layer svg {
   display: block;
   width: 100%;
   height: auto;
 }
 
-.piping {
-  z-index: 4;
-  pointer-events: none;
-}
-
-.shadows {
+.grill-layer {
   z-index: 5;
-  mix-blend-mode: multiply;
-  pointer-events: none;
 }
 
-.spotlight {
+.piping-layer {
   z-index: 6;
-  mix-blend-mode: soft-light;
-  pointer-events: none;
-}
-
-.highlights {
-  z-index: 7;
-  mix-blend-mode: overlay;
-  pointer-events: none;
 }
 
 .selectors-card {
   width: 100%;
-  padding: 0;
+  padding: 4px 0 20px;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
-  gap: clamp(22px, 9vw, 52px);
-  flex-wrap: nowrap;
+  gap: 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.selectors-card::-webkit-scrollbar {
+  display: none;
 }
 
 .selector-block {
-  width: 132px;
-  flex: 0 0 132px;
+  width: 124px;
+  flex: 0 0 124px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
+.selector-block.hidden {
+  display: none;
+}
+
 .selector-label {
   color: #161616;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .selected-name {
-  min-height: 24px;
+  min-height: 28px;
   width: 100%;
   text-align: center;
-  font-size: clamp(1rem, 4vw, 1.35rem);
+  font-size: 1rem;
   font-weight: 900;
   line-height: 1.05;
+  display: grid;
+  place-items: center;
 }
 
 .selected-meta {
@@ -150,13 +152,13 @@ h1 {
 
 .wheel-arrow {
   color: rgba(0, 0, 0, 0.38);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   line-height: 1;
   font-weight: 900;
 }
 
 .wheel-arrow.up {
-  margin-top: 7px;
+  margin-top: 6px;
   margin-bottom: 2px;
 }
 
@@ -166,15 +168,19 @@ h1 {
 
 .wheel-wrap {
   position: relative;
-  width: 120px;
+  width: 116px;
   height: 112px;
   display: grid;
   place-items: center;
 }
 
+.wheel-wrap.short {
+  height: 112px;
+}
+
 .wheel-zone {
   position: absolute;
-  width: 78px;
+  width: 80px;
   height: 60px;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
@@ -184,7 +190,7 @@ h1 {
 
 .wheel {
   position: relative;
-  width: 120px;
+  width: 116px;
   height: 112px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -192,7 +198,6 @@ h1 {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   background: transparent;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -225,25 +230,24 @@ h1 {
 }
 
 .wheel-item {
-  width: 120px;
+  width: 116px;
   height: 56px;
   flex: 0 0 56px;
   scroll-snap-align: center;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   opacity: 0.16;
   transform: scale(0.82);
   transition:
     opacity 160ms ease,
     transform 160ms ease,
     filter 160ms ease;
-
   background: transparent;
   border: 0;
   padding: 0;
+  color: #161616;
+  font: inherit;
 }
 
 .wheel-item.selected {
@@ -268,6 +272,19 @@ h1 {
   box-shadow: none;
 }
 
+.text-chip {
+  min-width: 78px;
+  min-height: 38px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.45);
+}
+
 @keyframes swatch-breathe {
   0%, 100% {
     transform: translateY(0) scale(1);
@@ -280,13 +297,14 @@ h1 {
 
 @media (min-width: 800px) {
   .app {
-    max-width: 1050px;
+    max-width: 1180px;
     margin: 0 auto;
     padding: 30px;
   }
 
   .selectors-card {
-    max-width: 520px;
-    margin: 0 auto;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: visible;
   }
 }
