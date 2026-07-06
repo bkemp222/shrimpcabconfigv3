@@ -523,13 +523,13 @@ RESPONSIVE
     }
 
 .size-selector .image-btn img{
-    width:70px !important;
-    max-width:70px !important;
+    width:30px !important;
+    max-width:30px !important;
 }
 
 #liverySelector .image-btn img{
-    width:80px !important;
-    max-width:80px !important;
+    width:30px !important;
+    max-width:30px !important;
 }
 
     .grill-grid{
