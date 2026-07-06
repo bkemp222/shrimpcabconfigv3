@@ -85,10 +85,10 @@ LANDING PAGE
 .instrument-buttons{
 
     display:flex;
-    gap:12px;
+    gap:24px;
 
     flex-wrap:wrap;
-    justify-content:center;
+    justify-content:flex-start;
 }
 
 .instrument-buttons img{
