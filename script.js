@@ -77,8 +77,28 @@ const main2Label = document.getElementById("main2Label");
 const accentLabel = document.getElementById("accentLabel");
 const grillLabel = document.getElementById("grillLabel");
 
+const wheelRefs = {
+  main: mainWheel,
+  main2: main2Wheel,
+  accent: accentWheel
+};
+
+const wheelLabels = {
+  main: mainLabel,
+  main2: main2Label,
+  accent: accentLabel
+};
+
+let wheelScrollTimers = {};
+let renderToken = 0;
+
 function asset(path) {
   return `${ASSET_ROOT}/${path}`;
+}
+
+function wrapIndex(index) {
+  const total = TOLEX_COLORS.length;
+  return ((index % total) + total) % total;
 }
 
 function colorByZone(zone) {
@@ -97,6 +117,12 @@ function startConfigurator(instrument) {
 
   buildStaticControls();
   renderAll();
+
+  requestAnimationFrame(() => {
+    centerWheelOnSelected("main", false);
+    centerWheelOnSelected("main2", false);
+    centerWheelOnSelected("accent", false);
+  });
 }
 
 function buildStaticControls() {
@@ -104,6 +130,7 @@ function buildStaticControls() {
   buildLiveryButtons();
   buildGrillButtons();
   buildWheels();
+  updateTrimButtons();
 }
 
 function buildSizeButtons() {
@@ -117,9 +144,12 @@ function buildSizeButtons() {
 
     const img = document.createElement("img");
     img.alt = size;
-    img.src = asset(`swatches/size/${size}_${state.size === size ? "active" : "idle"}.png`);
+
+    const buttonState = state.size === size ? "active" : "idle";
+    img.src = asset(`swatches/size/${size}_${buttonState}.png`);
 
     btn.appendChild(img);
+
     btn.addEventListener("click", () => {
       state.size = size;
       renderAll();
@@ -139,9 +169,12 @@ function buildLiveryButtons() {
 
     const img = document.createElement("img");
     img.alt = livery;
-    img.src = asset(`swatches/liveries/${livery}_${state.livery === livery ? "active" : "idle"}.png`);
+
+    const buttonState = state.livery === livery ? "active" : "idle";
+    img.src = asset(`swatches/liveries/${livery}_${buttonState}.png`);
 
     btn.appendChild(img);
+
     btn.addEventListener("click", () => {
       state.livery = livery;
       renderAll();
@@ -161,9 +194,12 @@ function buildGrillButtons() {
 
     const img = document.createElement("img");
     img.alt = grill.name;
-    img.src = asset(`swatches/grills/${grill.id}_${state.grill === grill.id ? "active" : "idle"}.png`);
+
+    const buttonState = state.grill === grill.id ? "active" : "idle";
+    img.src = asset(`swatches/grills/${grill.id}_${buttonState}.png`);
 
     btn.appendChild(img);
+
     btn.addEventListener("click", () => {
       state.grill = grill.id;
       renderAll();
@@ -174,49 +210,104 @@ function buildGrillButtons() {
 }
 
 function buildWheels() {
-  renderWheel("main", mainWheel, mainLabel);
-  renderWheel("main2", main2Wheel, main2Label);
-  renderWheel("accent", accentWheel, accentLabel);
+  buildScrollableWheel("main");
+  buildScrollableWheel("main2");
+  buildScrollableWheel("accent");
 }
 
-function renderWheel(zone, container, label) {
+function buildScrollableWheel(zone) {
+  const container = wheelRefs[zone];
   container.innerHTML = "";
 
-  const selected = state.colors[zone];
-  const visible = [-1, 0, 1].map(offset => wrapIndex(selected + offset));
-
-  visible.forEach(index => {
-    const color = TOLEX_COLORS[index];
+  TOLEX_COLORS.forEach((color, index) => {
     const img = document.createElement("img");
-    img.className = `swatch ${index === selected ? "active" : ""}`;
+    img.className = "swatch";
+    img.dataset.index = index;
     img.src = asset(`swatches/colors/${color.swatch}`);
     img.alt = color.name;
+
     img.addEventListener("click", () => {
       state.colors[zone] = index;
-      renderAll();
+      updateWheelState(zone);
+      centerWheelOnSelected(zone, true);
+      renderCab();
     });
+
     container.appendChild(img);
   });
 
-  label.textContent = colorByZone(zone).name;
+  container.addEventListener("scroll", () => {
+    clearTimeout(wheelScrollTimers[zone]);
+
+    const index = getCenteredSwatchIndex(container);
+
+    if (index !== state.colors[zone]) {
+      state.colors[zone] = index;
+      updateWheelState(zone);
+      renderCab();
+    }
+
+    wheelScrollTimers[zone] = setTimeout(() => {
+      centerWheelOnSelected(zone, true);
+    }, 120);
+  });
+
+  updateWheelState(zone);
 }
 
-function wrapIndex(index) {
-  const total = TOLEX_COLORS.length;
-  return ((index % total) + total) % total;
+function getCenteredSwatchIndex(container) {
+  const containerBox = container.getBoundingClientRect();
+  const centerX = containerBox.left + containerBox.width / 2;
+
+  let closestIndex = 0;
+  let closestDistance = Infinity;
+
+  container.querySelectorAll(".swatch").forEach(swatch => {
+    const box = swatch.getBoundingClientRect();
+    const swatchCenter = box.left + box.width / 2;
+    const distance = Math.abs(centerX - swatchCenter);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = Number(swatch.dataset.index);
+    }
+  });
+
+  return closestIndex;
+}
+
+function updateWheelState(zone) {
+  const container = wheelRefs[zone];
+  const selected = state.colors[zone];
+
+  container.querySelectorAll(".swatch").forEach(swatch => {
+    swatch.classList.toggle("active", Number(swatch.dataset.index) === selected);
+  });
+
+  wheelLabels[zone].textContent = TOLEX_COLORS[selected].name;
+}
+
+function centerWheelOnSelected(zone, smooth = true) {
+  const container = wheelRefs[zone];
+  const selected = container.querySelector(`.swatch[data-index="${state.colors[zone]}"]`);
+
+  if (!selected) return;
+
+  const target =
+    selected.offsetLeft -
+    container.clientWidth / 2 +
+    selected.clientWidth / 2;
+
+  container.scrollTo({
+    left: target,
+    behavior: smooth ? "smooth" : "auto"
+  });
 }
 
 function stepWheel(zone, direction) {
   state.colors[zone] = wrapIndex(state.colors[zone] + direction);
-  renderAll();
-}
-
-function renderAll() {
-  buildSizeButtons();
-  buildLiveryButtons();
-  buildGrillButtons();
-  buildWheels();
-  updateTrimButtons();
+  updateWheelState(zone);
+  centerWheelOnSelected(zone, true);
   renderCab();
 }
 
@@ -226,7 +317,22 @@ function updateTrimButtons() {
   });
 }
 
+function renderAll() {
+  buildSizeButtons();
+  buildLiveryButtons();
+  buildGrillButtons();
+
+  updateWheelState("main");
+  updateWheelState("main2");
+  updateWheelState("accent");
+
+  updateTrimButtons();
+  renderCab();
+}
+
 function renderCab() {
+  const thisRender = ++renderToken;
+
   renderStage.innerHTML = "";
 
   const size = state.size;
@@ -236,7 +342,7 @@ function renderCab() {
   addImage(asset(`${size}/base/${baseFile}`), "base");
 
   getSvgLayers(livery).forEach(layer => {
-    addSvgColorLayer(size, layer.file, layer.zone);
+    addSvgColorLayer(size, layer.file, layer.zone, thisRender);
   });
 
   if (state.instrument === "guitar") {
@@ -246,8 +352,7 @@ function renderCab() {
     grillLabel.textContent = grill ? grill.name : "";
   }
 
-  const liveryPiping = asset(`${size}/piping/${livery}_${state.grillTrim}.png`);
-  addImage(liveryPiping, "piping");
+  addImage(asset(`${size}/piping/${livery}_${state.grillTrim}.png`), "piping");
 
   if (state.instrument === "guitar") {
     addImage(asset(`${size}/piping/grill_${state.grillTrim}.png`), "piping");
@@ -280,7 +385,7 @@ function svgFolderForSize(size) {
   return size === "210" ? "untitled folder" : "svg";
 }
 
-function addSvgColorLayer(size, svgFile, zone) {
+function addSvgColorLayer(size, svgFile, zone, thisRender) {
   const color = colorByZone(zone);
 
   fetch(asset(`${size}/${svgFolderForSize(size)}/${svgFile}`))
@@ -289,16 +394,37 @@ function addSvgColorLayer(size, svgFile, zone) {
       return response.text();
     })
     .then(svgText => {
-      const coloredSvg = svgText
-        .replace(/fill="[^"]*"/g, `fill="${color.hex}"`)
-        .replace(/fill:[^;"']*/g, `fill:${color.hex}`);
+      if (thisRender !== renderToken) return;
 
-      const blob = new Blob([coloredSvg], { type: "image/svg+xml" });
-      const url = URL.createObjectURL(blob);
+      const coloredSvg = forceSvgColor(svgText, color.hex);
 
-      addImage(url, "color-layer", () => URL.revokeObjectURL(url));
+      const encoded = encodeURIComponent(coloredSvg)
+        .replace(/'/g, "%27")
+        .replace(/"/g, "%22");
+
+      addImage(`data:image/svg+xml;charset=utf-8,${encoded}`, "color-layer");
     })
     .catch(error => console.warn(error.message));
+}
+
+function forceSvgColor(svgText, hex) {
+  let svg = svgText;
+
+  svg = svg.replace(/fill="[^"]*"/gi, "");
+  svg = svg.replace(/stroke="[^"]*"/gi, "");
+  svg = svg.replace(/style="[^"]*"/gi, match => {
+    return match
+      .replace(/fill\s*:\s*[^;"]+;?/gi, "")
+      .replace(/stroke\s*:\s*[^;"]+;?/gi, "");
+  });
+
+  svg = svg.replace(/<path\b/gi, `<path fill="${hex}"`);
+  svg = svg.replace(/<polygon\b/gi, `<polygon fill="${hex}"`);
+  svg = svg.replace(/<rect\b/gi, `<rect fill="${hex}"`);
+  svg = svg.replace(/<circle\b/gi, `<circle fill="${hex}"`);
+  svg = svg.replace(/<ellipse\b/gi, `<ellipse fill="${hex}"`);
+
+  return svg;
 }
 
 function addImage(src, className, onLoad) {
@@ -306,10 +432,15 @@ function addImage(src, className, onLoad) {
   img.src = src;
   img.className = className;
   img.alt = "";
+
   img.onload = () => {
     if (typeof onLoad === "function") onLoad();
   };
-  img.onerror = () => img.remove();
+
+  img.onerror = () => {
+    img.remove();
+  };
+
   renderStage.appendChild(img);
 }
 
