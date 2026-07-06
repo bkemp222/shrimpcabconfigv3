@@ -90,7 +90,95 @@ const wheelLabels = {
 };
 
 let wheelScrollTimers = {};
-let renderToken = 0;
+let wheelIsProgrammatic = {
+  main: false,
+  main2: false,
+  accent: false
+};
+
+function buildWheels() {
+  buildScrollableWheel("main");
+  buildScrollableWheel("main2");
+  buildScrollableWheel("accent");
+
+  requestAnimationFrame(() => {
+    centerWheelOnSelected("main", false);
+    centerWheelOnSelected("main2", false);
+    centerWheelOnSelected("accent", false);
+  });
+}
+
+function buildScrollableWheel(zone) {
+  const container = wheelRefs[zone];
+  container.innerHTML = "";
+
+  TOLEX_COLORS.forEach((color, index) => {
+    const img = document.createElement("img");
+    img.className = "swatch";
+    img.dataset.index = index;
+    img.src = asset(`swatches/colors/${color.swatch}`);
+    img.alt = color.name;
+
+    img.addEventListener("click", () => {
+      state.colors[zone] = index;
+      updateWheelState(zone);
+      centerWheelOnSelected(zone, true);
+      renderCab();
+    });
+
+    container.appendChild(img);
+  });
+
+  container.addEventListener("scroll", () => {
+    if (wheelIsProgrammatic[zone]) return;
+
+    clearTimeout(wheelScrollTimers[zone]);
+
+    const index = getCenteredSwatchIndex(container);
+
+    if (index !== state.colors[zone]) {
+      state.colors[zone] = index;
+      updateWheelState(zone);
+      renderCab();
+    }
+
+    wheelScrollTimers[zone] = setTimeout(() => {
+      centerWheelOnSelected(zone, true);
+    }, 180);
+  });
+
+  updateWheelState(zone);
+}
+
+function centerWheelOnSelected(zone, smooth = true) {
+  const container = wheelRefs[zone];
+  const selected = container.querySelector(`.swatch[data-index="${state.colors[zone]}"]`);
+
+  if (!selected) return;
+
+  const target =
+    selected.offsetLeft -
+    container.clientWidth / 2 +
+    selected.clientWidth / 2;
+
+  wheelIsProgrammatic[zone] = true;
+
+  container.scrollTo({
+    left: target,
+    behavior: smooth ? "smooth" : "auto"
+  });
+
+  setTimeout(() => {
+    wheelIsProgrammatic[zone] = false;
+  }, smooth ? 350 : 50);
+}
+
+function stepWheel(zone, direction) {
+  state.colors[zone] = wrapIndex(state.colors[zone] + direction);
+  updateWheelState(zone);
+  centerWheelOnSelected(zone, true);
+  renderCab();
+}
 
 function asset(path) {
   return `${ASSET_ROOT}/${path}`;
@@ -118,11 +206,6 @@ function startConfigurator(instrument) {
   buildStaticControls();
   renderAll();
 
-  requestAnimationFrame(() => {
-    centerWheelOnSelected("main", false);
-    centerWheelOnSelected("main2", false);
-    centerWheelOnSelected("accent", false);
-  });
 }
 
 function buildStaticControls() {
