@@ -36,6 +36,12 @@ img{
     display:none!important;
 }
 
+:root{
+    --cab-button-size: 40px;
+    --livery-button-size: 40px;
+    --grill-button-size: 40px;
+}
+
 /* ===========================
 APP
 =========================== */
@@ -145,10 +151,7 @@ CAB SIZE
 }
 
 .size-selector img{
-
-    width:20px;
-
-    transition:.18s;
+    width:var(--cab-button-size);
 }
 
 .size-selector img:hover{
