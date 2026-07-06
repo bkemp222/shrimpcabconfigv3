@@ -57,14 +57,22 @@ LANDING PAGE
 =========================== */
 
 .instrument-screen{
+    background:#000;
+    color:white;
+
     min-height:100vh;
+
+    width:100vw;
+
+    margin-left:calc(50% - 50vw);
+    margin-right:calc(50% - 50vw);
 
     display:flex;
     flex-direction:column;
-    justify-content:flex-start;
     align-items:center;
+    justify-content:flex-start;
 
-    gap:10px;
+    padding-top:20px;
 }
 
 .instrument-hero{
