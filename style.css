@@ -68,6 +68,7 @@ LANDING PAGE
     width:min(200px,90vw);
     height:auto;
     display:block;
+    margin: 20px 0;
 }
 
 .instrument-screen{
