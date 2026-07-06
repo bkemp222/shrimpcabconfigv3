@@ -56,6 +56,20 @@ APP
 LANDING PAGE
 =========================== */
 
+.site-header{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:20px 0 10px;
+}
+
+.header-logo{
+    width:min(700px,90vw);
+    height:auto;
+    display:block;
+}
+
 .instrument-screen{
     background:#000;
     color:white;
