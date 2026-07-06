@@ -1,28 +1,30 @@
 const ASSET_ROOT = "assets";
 
 const TOLEX_COLORS = [
-  { name: "Black", slug: "black", hex: "#222222", swatch: "black.png" },
-  { name: "Emerald Green", slug: "emerald-green", hex: "#274037", swatch: "british green.png" },
-  { name: "Teal", slug: "teal", hex: "#0aa6a1", swatch: "teal_levant.png" },
-  { name: "Navy", slug: "navy", hex: "#112a49", swatch: "navy.png" },
-  { name: "Regency Blue", slug: "regency-blue", hex: "#1662cf", swatch: "regency blue.png" },
-  { name: "Purple", slug: "purple", hex: "#3b2f66", swatch: "purple.png" },
-  { name: "Apple Green", slug: "apple-green", hex: "#64b630", swatch: "apple green.png" },
-  { name: "Cocoa", slug: "cocoa", hex: "#65574d", swatch: "cocoa.png" },
-  { name: "Seafoam Green", slug: "seafoam-green", hex: "#7fac74", swatch: "seafoam green.png" },
-  { name: "Gold", slug: "gold", hex: "#8b8758", swatch: "gold metallic.png" },
-  { name: "Carolina Blue", slug: "carolina-blue", hex: "#8dbad6", swatch: "carolina blue.png" },
-  { name: "Silver", slug: "silver", hex: "#a4aeac", swatch: "silver.png" },
-  { name: "Pink", slug: "pink", hex: "#bd8897", swatch: "pink.png" },
-  { name: "Ivory", slug: "ivory", hex: "#d4c49b", swatch: "ivory.png" },
-  { name: "Yellow", slug: "yellow", hex: "#dfce5b", swatch: "yellow.png" },
-  { name: "White", slug: "white", hex: "#e9e9e9", swatch: "white.png" },
-  { name: "Flamingo Pink", slug: "flamingo-pink", hex: "#ec5d75", swatch: "flamingo pink.png" },
-  { name: "Orange", slug: "orange", hex: "#f27f2f", swatch: "orange.png" },
-  { name: "Red", slug: "red", hex: "#ff1111", swatch: "red.png" }
+  { name: "Black", hex: "#222222", swatch: "black.png" },
+  { name: "British Green", hex: "#274037", swatch: "british green.png" },
+  { name: "Teal Levant", hex: "#0aa6a1", swatch: "teal_levant.png" },
+  { name: "Navy", hex: "#112a49", swatch: "navy.png" },
+  { name: "Regency Blue", hex: "#1662cf", swatch: "regency blue.png" },
+  { name: "Purple", hex: "#3b2f66", swatch: "purple.png" },
+  { name: "Apple Green", hex: "#64b630", swatch: "apple green.png" },
+  { name: "Cocoa", hex: "#65574d", swatch: "cocoa.png" },
+  { name: "Seafoam Green", hex: "#7fac74", swatch: "seafoam green.png" },
+  { name: "Gold Metallic", hex: "#8b8758", swatch: "gold metallic.png" },
+  { name: "Carolina Blue", hex: "#8dbad6", swatch: "carolina blue.png" },
+  { name: "Silver", hex: "#a4aeac", swatch: "silver.png" },
+  { name: "Pink", hex: "#bd8897", swatch: "pink.png" },
+  { name: "Ivory", hex: "#d4c49b", swatch: "ivory.png" },
+  { name: "Yellow", hex: "#dfce5b", swatch: "yellow.png" },
+  { name: "White", hex: "#e9e9e9", swatch: "white.png" },
+  { name: "Flamingo Pink", hex: "#ec5d75", swatch: "flamingo pink.png" },
+  { name: "Orange", hex: "#f27f2f", swatch: "orange.png" },
+  { name: "Red", hex: "#ff1111", swatch: "red.png" }
 ];
 
-const LIVERIES = ["tiger", "shock", "nitro"];
+const LIVERIES = ["tiger", "nitro", "shock"];
+const GUITAR_SIZES = ["112", "212h", "212v", "412"];
+const BASS_SIZES = ["210"];
 
 const GRILLS = [
   { id: "blackbasket", name: "Black Basketweave" },
@@ -30,13 +32,10 @@ const GRILLS = [
   { id: "agedsilver", name: "Aged Silver" },
   { id: "fendersilver", name: "Fender Silver" },
   { id: "oxblood", name: "Oxblood" },
-  { id: "saltpepper", name: "Salt and Pepper" }
+  { id: "saltpepper", name: "Salt & Pepper" }
 ];
 
-const GUITAR_SIZES = ["112", "212h", "212v", "412"];
-const BASS_SIZES = ["210"];
-
-const SIZE_BASE_FILE = {
+const BASE_FILES = {
   "112": "base.png",
   "210": "base.png",
   "212h": "212h_base.png",
@@ -47,9 +46,9 @@ const SIZE_BASE_FILE = {
 const state = {
   instrument: null,
   size: "412",
-  livery: "nitro",
+  livery: "tiger",
   grill: "blackbasket",
-  grillTrim: "white",
+  grillPiping: "white",
   colors: {
     main: 0,
     main2: 9,
@@ -57,491 +56,501 @@ const state = {
   }
 };
 
-const instrumentScreen = document.getElementById("instrumentScreen");
-const configurator = document.getElementById("configurator");
-const renderStage = document.getElementById("renderStage");
+const els = {
+  instrumentScreen: document.getElementById("instrumentScreen"),
+  configurator: document.getElementById("configurator"),
+  backToInstrument: document.getElementById("backToInstrument"),
 
-const sizeSelector = document.getElementById("sizeSelector");
-const liverySelector = document.getElementById("liverySelector");
-const grillSelector = document.getElementById("grillSelector");
+  sizeSelector: document.getElementById("sizeSelector"),
+  liverySelector: document.getElementById("liverySelector"),
+  grillSelector: document.getElementById("grillSelector"),
+  guitarControls: document.getElementById("guitarControls"),
 
-const grillSection = document.getElementById("grillSection");
-const grillTrimSection = document.getElementById("grillTrimSection");
+  renderStage: document.getElementById("renderStage"),
 
-const mainWheel = document.getElementById("mainWheel");
-const main2Wheel = document.getElementById("main2Wheel");
-const accentWheel = document.getElementById("accentWheel");
+  mainWheel: document.getElementById("mainWheel"),
+  main2Wheel: document.getElementById("main2Wheel"),
+  accentWheel: document.getElementById("accentWheel"),
 
-const mainLabel = document.getElementById("mainLabel");
-const main2Label = document.getElementById("main2Label");
-const accentLabel = document.getElementById("accentLabel");
-const grillLabel = document.getElementById("grillLabel");
-
-const wheelRefs = {
-  main: mainWheel,
-  main2: main2Wheel,
-  accent: accentWheel
+  mainLabel: document.getElementById("mainLabel"),
+  main2Label: document.getElementById("main2Label"),
+  accentLabel: document.getElementById("accentLabel"),
+  grillLabel: document.getElementById("grillLabel")
 };
 
-const wheelLabels = {
-  main: mainLabel,
-  main2: main2Label,
-  accent: accentLabel
+const wheelMap = {
+  main: {
+    el: els.mainWheel,
+    label: els.mainLabel,
+    programmatic: false,
+    timer: null
+  },
+  main2: {
+    el: els.main2Wheel,
+    label: els.main2Label,
+    programmatic: false,
+    timer: null
+  },
+  accent: {
+    el: els.accentWheel,
+    label: els.accentLabel,
+    programmatic: false,
+    timer: null
+  }
 };
 
-let wheelScrollTimers = {};
-let wheelIsProgrammatic = {
-  main: false,
-  main2: false,
-  accent: false
+const layerEls = {
+  base: null,
+  main: null,
+  main2: null,
+  accent: null,
+  grill: null,
+  grillPiping: null,
+  liveryPiping: null
 };
 
-function buildWheels() {
-  buildScrollableWheel("main");
-  buildScrollableWheel("main2");
-  buildScrollableWheel("accent");
-
-  requestAnimationFrame(() => {
-    centerWheelOnSelected("main", false);
-    centerWheelOnSelected("main2", false);
-    centerWheelOnSelected("accent", false);
-  });
-}
-
-function buildScrollableWheel(zone) {
-  const container = wheelRefs[zone];
-  container.innerHTML = "";
-
-  TOLEX_COLORS.forEach((color, index) => {
-    const img = document.createElement("img");
-    img.className = "swatch";
-    img.dataset.index = index;
-    img.src = asset(`swatches/colors/${color.swatch}`);
-    img.alt = color.name;
-
-    img.addEventListener("click", () => {
-      state.colors[zone] = index;
-      updateWheelState(zone);
-      centerWheelOnSelected(zone, true);
-      renderCab();
-    });
-
-    container.appendChild(img);
-  });
-
-  container.addEventListener("scroll", () => {
-    if (wheelIsProgrammatic[zone]) return;
-
-    clearTimeout(wheelScrollTimers[zone]);
-
-    const index = getCenteredSwatchIndex(container);
-
-    if (index !== state.colors[zone]) {
-      state.colors[zone] = index;
-      updateWheelState(zone);
-      renderCab();
-    }
-
-    wheelScrollTimers[zone] = setTimeout(() => {
-      centerWheelOnSelected(zone, true);
-    }, 180);
-  });
-
-  updateWheelState(zone);
-}
-
-function centerWheelOnSelected(zone, smooth = true) {
-  const container = wheelRefs[zone];
-  const selected = container.querySelector(`.swatch[data-index="${state.colors[zone]}"]`);
-
-  if (!selected) return;
-
-  const target =
-    selected.offsetLeft -
-    container.clientWidth / 2 +
-    selected.clientWidth / 2;
-
-  wheelIsProgrammatic[zone] = true;
-
-  container.scrollTo({
-    left: target,
-    behavior: smooth ? "smooth" : "auto"
-  });
-
-  setTimeout(() => {
-    wheelIsProgrammatic[zone] = false;
-  }, smooth ? 350 : 50);
-}
-
-function stepWheel(zone, direction) {
-  state.colors[zone] = wrapIndex(state.colors[zone] + direction);
-  updateWheelState(zone);
-  centerWheelOnSelected(zone, true);
-  renderCab();
-}
+const svgCache = new Map();
+let renderId = 0;
 
 function asset(path) {
   return `${ASSET_ROOT}/${path}`;
 }
 
-function wrapIndex(index) {
-  const total = TOLEX_COLORS.length;
-  return ((index % total) + total) % total;
+function slugLabel(text) {
+  return text.replace(/&/g, "and").replace(/\s+/g, " ").trim();
 }
 
-function colorByZone(zone) {
+function svgFolder(size) {
+  return size === "210" ? "untitled folder" : "svg";
+}
+
+function wrapIndex(index) {
+  return ((index % TOLEX_COLORS.length) + TOLEX_COLORS.length) % TOLEX_COLORS.length;
+}
+
+function getColor(zone) {
   return TOLEX_COLORS[state.colors[zone]];
+}
+
+function getAvailableSizes() {
+  return state.instrument === "bass" ? BASS_SIZES : GUITAR_SIZES;
+}
+
+function getLiveryLayers(livery) {
+  if (livery === "tiger") {
+    return [
+      { zone: "main", file: "tiger_body.svg" },
+      { zone: "accent", file: "tiger_stripes.svg" }
+    ];
+  }
+
+  if (livery === "nitro") {
+    return [
+      { zone: "main", file: "nitro_body.svg" },
+      { zone: "accent", file: "nitro_flames.svg" }
+    ];
+  }
+
+  return [
+    { zone: "main", file: "shock_top.svg" },
+    { zone: "main2", file: "shock_bottom.svg" },
+    { zone: "accent", file: "shock_bolt.svg" }
+  ];
+}
+
+function init() {
+  buildRenderLayers();
+  bindInstrumentButtons();
+  bindBackButton();
+  bindWheelButtons();
+  bindPipingButtons();
+}
+
+function buildRenderLayers() {
+  els.renderStage.innerHTML = "";
+
+  layerEls.base = makeImg("base");
+  layerEls.main = makeImg("mask-main");
+  layerEls.main2 = makeImg("mask-main2");
+  layerEls.accent = makeImg("mask-accent");
+  layerEls.grill = makeImg("grill");
+  layerEls.grillPiping = makeImg("grillPiping");
+  layerEls.liveryPiping = makeImg("liveryPiping");
+
+  els.renderStage.appendChild(layerEls.base);
+  els.renderStage.appendChild(layerEls.main);
+  els.renderStage.appendChild(layerEls.main2);
+  els.renderStage.appendChild(layerEls.accent);
+  els.renderStage.appendChild(layerEls.grill);
+  els.renderStage.appendChild(layerEls.grillPiping);
+  els.renderStage.appendChild(layerEls.liveryPiping);
+}
+
+function makeImg(className) {
+  const img = document.createElement("img");
+  img.className = className;
+  img.alt = "";
+  img.draggable = false;
+
+  img.onerror = () => {
+    img.removeAttribute("src");
+  };
+
+  return img;
+}
+
+function bindInstrumentButtons() {
+  document.querySelectorAll("[data-instrument]").forEach(button => {
+    button.addEventListener("click", () => {
+      startConfigurator(button.dataset.instrument);
+    });
+  });
+}
+
+function bindBackButton() {
+  els.backToInstrument.addEventListener("click", () => {
+    els.configurator.classList.add("hidden");
+    els.instrumentScreen.classList.remove("hidden");
+    state.instrument = null;
+  });
+}
+
+function bindWheelButtons() {
+  document.querySelectorAll("[data-wheel]").forEach(button => {
+    button.addEventListener("click", () => {
+      const zone = button.dataset.wheel;
+      const dir = Number(button.dataset.dir);
+      setWheelIndex(zone, wrapIndex(state.colors[zone] + dir), true);
+    });
+  });
+}
+
+function bindPipingButtons() {
+  document.querySelectorAll("[data-grill-piping]").forEach(button => {
+    button.addEventListener("click", () => {
+      state.grillPiping = button.dataset.grillPiping;
+      updatePipingButtons();
+      renderCab();
+    });
+  });
 }
 
 function startConfigurator(instrument) {
   state.instrument = instrument;
   state.size = instrument === "bass" ? "210" : "412";
 
-  instrumentScreen.classList.add("hidden");
-  configurator.classList.remove("hidden");
+  els.instrumentScreen.classList.add("hidden");
+  els.configurator.classList.remove("hidden");
+  els.guitarControls.classList.toggle("hidden", instrument === "bass");
 
-  grillSection.style.display = instrument === "bass" ? "none" : "";
-  grillTrimSection.style.display = instrument === "bass" ? "none" : "";
-
-  buildStaticControls();
-  renderAll();
-
-}
-
-function buildStaticControls() {
   buildSizeButtons();
   buildLiveryButtons();
   buildGrillButtons();
-  buildWheels();
-  updateTrimButtons();
+  buildColorWheels();
+
+  updatePipingButtons();
+  renderCab();
+
+  requestAnimationFrame(() => {
+    centerAllWheels(false);
+  });
 }
 
 function buildSizeButtons() {
-  const sizes = state.instrument === "bass" ? BASS_SIZES : GUITAR_SIZES;
-  sizeSelector.innerHTML = "";
+  els.sizeSelector.innerHTML = "";
 
-  sizes.forEach(size => {
-    const btn = document.createElement("button");
-    btn.className = "image-button";
-    btn.dataset.size = size;
+  getAvailableSizes().forEach(size => {
+    const button = document.createElement("button");
+    button.className = "image-btn";
+    button.dataset.size = size;
+    button.setAttribute("aria-label", `Choose ${size}`);
 
     const img = document.createElement("img");
     img.alt = size;
+    img.src = asset(`swatches/size/${size}_${state.size === size ? "active" : "idle"}.png`);
 
-    const buttonState = state.size === size ? "active" : "idle";
-    img.src = asset(`swatches/size/${size}_${buttonState}.png`);
+    button.appendChild(img);
 
-    btn.appendChild(img);
-
-    btn.addEventListener("click", () => {
+    button.addEventListener("click", () => {
       state.size = size;
-      renderAll();
+      buildSizeButtons();
+      renderCab();
     });
 
-    sizeSelector.appendChild(btn);
+    els.sizeSelector.appendChild(button);
   });
 }
 
 function buildLiveryButtons() {
-  liverySelector.innerHTML = "";
+  els.liverySelector.innerHTML = "";
 
   LIVERIES.forEach(livery => {
-    const btn = document.createElement("button");
-    btn.className = "image-button";
-    btn.dataset.livery = livery;
+    const button = document.createElement("button");
+    button.className = "image-btn";
+    button.dataset.livery = livery;
+    button.setAttribute("aria-label", `Choose ${livery}`);
 
     const img = document.createElement("img");
     img.alt = livery;
+    img.src = asset(`swatches/liveries/${livery}_${state.livery === livery ? "active" : "idle"}.png`);
 
-    const buttonState = state.livery === livery ? "active" : "idle";
-    img.src = asset(`swatches/liveries/${livery}_${buttonState}.png`);
+    button.appendChild(img);
 
-    btn.appendChild(img);
-
-    btn.addEventListener("click", () => {
+    button.addEventListener("click", () => {
       state.livery = livery;
-      renderAll();
+      buildLiveryButtons();
+      renderCab();
     });
 
-    liverySelector.appendChild(btn);
+    els.liverySelector.appendChild(button);
   });
 }
 
 function buildGrillButtons() {
-  grillSelector.innerHTML = "";
+  els.grillSelector.innerHTML = "";
 
   GRILLS.forEach(grill => {
-    const btn = document.createElement("button");
-    btn.className = "image-button";
-    btn.dataset.grill = grill.id;
+    const button = document.createElement("button");
+    button.className = "image-btn";
+    button.dataset.grill = grill.id;
+    button.setAttribute("aria-label", `Choose ${grill.name}`);
 
     const img = document.createElement("img");
     img.alt = grill.name;
+    img.src = asset(`swatches/grills/${grill.id}_${state.grill === grill.id ? "active" : "idle"}.png`);
 
-    const buttonState = state.grill === grill.id ? "active" : "idle";
-    img.src = asset(`swatches/grills/${grill.id}_${buttonState}.png`);
+    button.appendChild(img);
 
-    btn.appendChild(img);
-
-    btn.addEventListener("click", () => {
+    button.addEventListener("click", () => {
       state.grill = grill.id;
-      renderAll();
-    });
-
-    grillSelector.appendChild(btn);
-  });
-}
-
-function buildWheels() {
-  buildScrollableWheel("main");
-  buildScrollableWheel("main2");
-  buildScrollableWheel("accent");
-}
-
-function buildScrollableWheel(zone) {
-  const container = wheelRefs[zone];
-  container.innerHTML = "";
-
-  TOLEX_COLORS.forEach((color, index) => {
-    const img = document.createElement("img");
-    img.className = "swatch";
-    img.dataset.index = index;
-    img.src = asset(`swatches/colors/${color.swatch}`);
-    img.alt = color.name;
-
-    img.addEventListener("click", () => {
-      state.colors[zone] = index;
-      updateWheelState(zone);
-      centerWheelOnSelected(zone, true);
+      buildGrillButtons();
+      updateGrillLabel();
       renderCab();
     });
 
-    container.appendChild(img);
+    els.grillSelector.appendChild(button);
   });
 
-  container.addEventListener("scroll", () => {
-    clearTimeout(wheelScrollTimers[zone]);
-
-    const index = getCenteredSwatchIndex(container);
-
-    if (index !== state.colors[zone]) {
-      state.colors[zone] = index;
-      updateWheelState(zone);
-      renderCab();
-    }
-
-    wheelScrollTimers[zone] = setTimeout(() => {
-      centerWheelOnSelected(zone, true);
-    }, 120);
-  });
-
-  updateWheelState(zone);
+  updateGrillLabel();
 }
 
-function getCenteredSwatchIndex(container) {
-  const containerBox = container.getBoundingClientRect();
-  const centerX = containerBox.left + containerBox.width / 2;
+function buildColorWheels() {
+  ["main", "main2", "accent"].forEach(zone => {
+    const wheel = wheelMap[zone];
+    wheel.el.innerHTML = "";
 
-  let closestIndex = 0;
+    TOLEX_COLORS.forEach((color, index) => {
+      const swatch = document.createElement("img");
+      swatch.className = "swatch";
+      swatch.dataset.index = index;
+      swatch.src = asset(`swatches/colors/${color.swatch}`);
+      swatch.alt = color.name;
+      swatch.draggable = false;
+
+      swatch.addEventListener("click", () => {
+        setWheelIndex(zone, index, true);
+      });
+
+      wheel.el.appendChild(swatch);
+    });
+
+    wheel.el.addEventListener("scroll", () => {
+      handleWheelScroll(zone);
+    });
+
+    updateWheelVisual(zone);
+  });
+}
+
+function handleWheelScroll(zone) {
+  const wheel = wheelMap[zone];
+
+  if (wheel.programmatic) return;
+
+  const index = getCenteredIndex(wheel.el);
+
+  if (index !== state.colors[zone]) {
+    state.colors[zone] = index;
+    updateWheelVisual(zone);
+    renderCab();
+  }
+
+  clearTimeout(wheel.timer);
+  wheel.timer = setTimeout(() => {
+    centerWheel(zone, true);
+  }, 140);
+}
+
+function getCenteredIndex(container) {
+  const containerRect = container.getBoundingClientRect();
+  const center = containerRect.left + containerRect.width / 2;
+
+  let closest = 0;
   let closestDistance = Infinity;
 
   container.querySelectorAll(".swatch").forEach(swatch => {
-    const box = swatch.getBoundingClientRect();
-    const swatchCenter = box.left + box.width / 2;
-    const distance = Math.abs(centerX - swatchCenter);
+    const rect = swatch.getBoundingClientRect();
+    const swatchCenter = rect.left + rect.width / 2;
+    const distance = Math.abs(center - swatchCenter);
 
     if (distance < closestDistance) {
       closestDistance = distance;
-      closestIndex = Number(swatch.dataset.index);
+      closest = Number(swatch.dataset.index);
     }
   });
 
-  return closestIndex;
+  return closest;
 }
 
-function updateWheelState(zone) {
-  const container = wheelRefs[zone];
-  const selected = state.colors[zone];
+function setWheelIndex(zone, index, center = true) {
+  state.colors[zone] = wrapIndex(index);
+  updateWheelVisual(zone);
 
-  container.querySelectorAll(".swatch").forEach(swatch => {
-    swatch.classList.toggle("active", Number(swatch.dataset.index) === selected);
+  if (center) centerWheel(zone, true);
+
+  renderCab();
+}
+
+function updateWheelVisual(zone) {
+  const wheel = wheelMap[zone];
+  const index = state.colors[zone];
+
+  wheel.el.querySelectorAll(".swatch").forEach(swatch => {
+    swatch.classList.toggle("active", Number(swatch.dataset.index) === index);
   });
 
-  wheelLabels[zone].textContent = TOLEX_COLORS[selected].name;
+  wheel.label.textContent = getColor(zone).name;
 }
 
-function centerWheelOnSelected(zone, smooth = true) {
-  const container = wheelRefs[zone];
-  const selected = container.querySelector(`.swatch[data-index="${state.colors[zone]}"]`);
+function centerAllWheels(smooth = false) {
+  centerWheel("main", smooth);
+  centerWheel("main2", smooth);
+  centerWheel("accent", smooth);
+}
+
+function centerWheel(zone, smooth = true) {
+  const wheel = wheelMap[zone];
+  const selected = wheel.el.querySelector(`.swatch[data-index="${state.colors[zone]}"]`);
 
   if (!selected) return;
 
   const target =
     selected.offsetLeft -
-    container.clientWidth / 2 +
+    wheel.el.clientWidth / 2 +
     selected.clientWidth / 2;
 
-  container.scrollTo({
+  wheel.programmatic = true;
+
+  wheel.el.scrollTo({
     left: target,
     behavior: smooth ? "smooth" : "auto"
   });
+
+  window.setTimeout(() => {
+    wheel.programmatic = false;
+  }, smooth ? 320 : 60);
 }
 
-function stepWheel(zone, direction) {
-  state.colors[zone] = wrapIndex(state.colors[zone] + direction);
-  updateWheelState(zone);
-  centerWheelOnSelected(zone, true);
-  renderCab();
-}
-
-function updateTrimButtons() {
-  document.querySelectorAll("[data-grill-trim]").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.grillTrim === state.grillTrim);
+function updatePipingButtons() {
+  document.querySelectorAll("[data-grill-piping]").forEach(button => {
+    button.classList.toggle("active", button.dataset.grillPiping === state.grillPiping);
   });
 }
 
-function renderAll() {
-  buildSizeButtons();
-  buildLiveryButtons();
-  buildGrillButtons();
-
-  updateWheelState("main");
-  updateWheelState("main2");
-  updateWheelState("accent");
-
-  updateTrimButtons();
-  renderCab();
+function updateGrillLabel() {
+  const grill = GRILLS.find(item => item.id === state.grill);
+  els.grillLabel.textContent = grill ? grill.name : "";
 }
 
-function renderCab() {
-  const thisRender = ++renderToken;
-
-  renderStage.innerHTML = "";
-
+async function renderCab() {
+  const currentRender = ++renderId;
   const size = state.size;
   const livery = state.livery;
-  const baseFile = SIZE_BASE_FILE[size];
 
-  addImage(asset(`${size}/base/${baseFile}`), "base");
+  layerEls.base.src = asset(`${size}/base/${BASE_FILES[size]}`);
 
-  getSvgLayers(livery).forEach(layer => {
-    addSvgColorLayer(size, layer.file, layer.zone, thisRender);
-  });
+  layerEls.main.removeAttribute("src");
+  layerEls.main2.removeAttribute("src");
+  layerEls.accent.removeAttribute("src");
+
+  const layers = getLiveryLayers(livery);
+
+  for (const layer of layers) {
+    const svgUrl = await getColoredSvgUrl(size, layer.file, getColor(layer.zone).hex);
+
+    if (currentRender !== renderId) return;
+
+    layerEls[layer.zone].src = svgUrl;
+  }
 
   if (state.instrument === "guitar") {
-    addImage(asset(`${size}/grills/${state.grill}.png`), "grill");
-
-    const grill = GRILLS.find(item => item.id === state.grill);
-    grillLabel.textContent = grill ? grill.name : "";
+    layerEls.grill.src = asset(`${size}/grills/${state.grill}.png`);
+    layerEls.grillPiping.src = asset(`${size}/piping/grill_${state.grillPiping}.png`);
+  } else {
+    layerEls.grill.removeAttribute("src");
+    layerEls.grillPiping.removeAttribute("src");
   }
 
-  addImage(asset(`${size}/piping/${livery}_${state.grillTrim}.png`), "piping");
-
-  if (state.instrument === "guitar") {
-    addImage(asset(`${size}/piping/grill_${state.grillTrim}.png`), "piping");
-  }
+  layerEls.liveryPiping.src = asset(`${size}/piping/${livery}_${state.grillPiping}.png`);
 }
 
-function getSvgLayers(livery) {
-  if (livery === "tiger") {
-    return [
-      { file: "tiger_body.svg", zone: "main" },
-      { file: "tiger_stripes.svg", zone: "accent" }
-    ];
+async function getColoredSvgUrl(size, file, hex) {
+  const key = `${size}-${file}-${hex}`;
+
+  if (svgCache.has(key)) {
+    return svgCache.get(key);
   }
 
-  if (livery === "shock") {
-    return [
-      { file: "shock_top.svg", zone: "main" },
-      { file: "shock_bottom.svg", zone: "main2" },
-      { file: "shock_bolt.svg", zone: "accent" }
-    ];
+  const url = asset(`${size}/${svgFolder(size)}/${file}`);
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    console.warn(`Missing SVG: ${url}`);
+    return "";
   }
 
-  return [
-    { file: "nitro_body.svg", zone: "main" },
-    { file: "nitro_flames.svg", zone: "accent" }
-  ];
+  const svgText = await response.text();
+  const colored = colorSvg(svgText, hex);
+  const blob = new Blob([colored], { type: "image/svg+xml" });
+  const objectUrl = URL.createObjectURL(blob);
+
+  svgCache.set(key, objectUrl);
+
+  return objectUrl;
 }
 
-function svgFolderForSize(size) {
-  return size === "210" ? "untitled folder" : "svg";
-}
+function colorSvg(svgText, hex) {
+  const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
 
-function addSvgColorLayer(size, svgFile, zone, thisRender) {
-  const color = colorByZone(zone);
+  const svg = doc.querySelector("svg");
+  if (!svg) return svgText;
 
-  fetch(asset(`${size}/${svgFolderForSize(size)}/${svgFile}`))
-    .then(response => {
-      if (!response.ok) throw new Error(`Missing SVG: ${svgFile}`);
-      return response.text();
-    })
-    .then(svgText => {
-      if (thisRender !== renderToken) return;
+  const paintable = "path, polygon, rect, circle, ellipse";
 
-      const coloredSvg = forceSvgColor(svgText, color.hex);
+  doc.querySelectorAll(paintable).forEach(el => {
+    if (el.closest("defs, clipPath, mask")) return;
 
-      const encoded = encodeURIComponent(coloredSvg)
-        .replace(/'/g, "%27")
-        .replace(/"/g, "%22");
+    el.setAttribute("fill", hex);
+    el.removeAttribute("stroke");
 
-      addImage(`data:image/svg+xml;charset=utf-8,${encoded}`, "color-layer");
-    })
-    .catch(error => console.warn(error.message));
-}
+    const style = el.getAttribute("style");
 
-function forceSvgColor(svgText, hex) {
-  let svg = svgText;
+    if (style) {
+      const cleaned = style
+        .replace(/fill\s*:\s*[^;]+;?/gi, "")
+        .replace(/stroke\s*:\s*[^;]+;?/gi, "");
 
-  svg = svg.replace(/fill="[^"]*"/gi, "");
-  svg = svg.replace(/stroke="[^"]*"/gi, "");
-  svg = svg.replace(/style="[^"]*"/gi, match => {
-    return match
-      .replace(/fill\s*:\s*[^;"]+;?/gi, "")
-      .replace(/stroke\s*:\s*[^;"]+;?/gi, "");
+      if (cleaned.trim()) {
+        el.setAttribute("style", cleaned);
+      } else {
+        el.removeAttribute("style");
+      }
+    }
   });
 
-  svg = svg.replace(/<path\b/gi, `<path fill="${hex}"`);
-  svg = svg.replace(/<polygon\b/gi, `<polygon fill="${hex}"`);
-  svg = svg.replace(/<rect\b/gi, `<rect fill="${hex}"`);
-  svg = svg.replace(/<circle\b/gi, `<circle fill="${hex}"`);
-  svg = svg.replace(/<ellipse\b/gi, `<ellipse fill="${hex}"`);
+  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
-  return svg;
+  return new XMLSerializer().serializeToString(svg);
 }
 
-function addImage(src, className, onLoad) {
-  const img = document.createElement("img");
-  img.src = src;
-  img.className = className;
-  img.alt = "";
-
-  img.onload = () => {
-    if (typeof onLoad === "function") onLoad();
-  };
-
-  img.onerror = () => {
-    img.remove();
-  };
-
-  renderStage.appendChild(img);
-}
-
-document.querySelectorAll("[data-instrument]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    startConfigurator(btn.dataset.instrument);
-  });
-});
-
-document.querySelectorAll(".wheel-arrow").forEach(btn => {
-  btn.addEventListener("click", () => {
-    stepWheel(btn.dataset.zone, Number(btn.dataset.dir));
-  });
-});
-
-document.querySelectorAll("[data-grill-trim]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    state.grillTrim = btn.dataset.grillTrim;
-    renderAll();
-  });
-});
+init();
