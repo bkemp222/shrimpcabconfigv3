@@ -292,10 +292,7 @@ BUTTON ROWS
 }
 
 .button-row img{
-
-    width:20px;
-
-    transition:.15s;
+    width:var(--livery-button-size);
 }
 
 .button-row img:hover{
@@ -461,10 +458,7 @@ GRILL GRID
 }
 
 .grill-grid img{
-
-    width:40px;
-
-    transition:.18s;
+    width:var(--grill-button-size);
 }
 
 .grill-grid img:hover{
@@ -528,10 +522,15 @@ RESPONSIVE
         width:100px;
     }
 
-    .size-selector img{
+.size-selector .image-btn img{
+    width:70px !important;
+    max-width:70px !important;
+}
 
-        width:90px;
-    }
+#liverySelector .image-btn img{
+    width:80px !important;
+    max-width:80px !important;
+}
 
     .grill-grid{
 
