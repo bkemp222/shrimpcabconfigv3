@@ -85,7 +85,7 @@ LANDING PAGE
 .instrument-buttons{
 
     display:flex;
-    gap:24px;
+    gap:40px;
 
     flex-wrap:wrap;
     justify-content:flex-start;
