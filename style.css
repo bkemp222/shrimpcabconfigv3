@@ -128,10 +128,10 @@ TOP BAR
     background:#fff;
     border-radius:999px;
 
-    padding:12px 20px;
+    padding:8px 12px;
 
     font-weight:bold;
-    font-size:18px;
+    font-size:10px;
 
     border:2px solid #ddd;
 }
@@ -236,7 +236,7 @@ CONTROLS
 
     display:flex;
     flex-direction:column;
-    gap:34px;
+    gap:12px;
 }
 
 .control-layout{
@@ -245,7 +245,7 @@ CONTROLS
 
     grid-template-columns:420px 1fr;
 
-    gap:60px;
+    gap:12px;
 
     align-items:start;
 }
