@@ -22,6 +22,10 @@ const tabs = ["size", "livery", "tolex", "grill", "trim"] as const;
 const wheelCopies = 5;
 const wheelMiddleCopy = Math.floor(wheelCopies / 2);
 const loopedColors = Array.from({ length: wheelCopies }, () => colorOrder).flat();
+const wheelFriction = 0.962;
+const wheelVelocityThreshold = 0.045;
+const wheelMaxVelocity = 1.45;
+const wheelSnapDuration = 230;
 const startupMessages = [
   "Cutting tolex…",
   "Spilling the glue…",
@@ -86,6 +90,10 @@ function preloadImage(src: string) {
 
 function easeOutCubic(progress: number) {
   return 1 - Math.pow(1 - progress, 3);
+}
+
+function wrapColorIndex(index: number) {
+  return ((index % colorOrder.length) + colorOrder.length) % colorOrder.length;
 }
 
 function scrollByPage(container: HTMLDivElement | null, direction: -1 | 1) {
@@ -358,67 +366,238 @@ function LiveryPanel() {
 
 function TolexWheel({ slot, value, onChange }: { slot: 0 | 1 | 2; value: TolexColor; onChange: (slot: 0 | 1 | 2, color: TolexColor) => void }) {
   const ref = useRef<HTMLDivElement>(null);
-  const settling = useRef<number | null>(null);
-  const suppressScroll = useRef(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const itemPitch = useRef(54);
+  const itemHeight = useRef(46);
+  const trackInset = useRef(0);
+  const position = useRef(wheelMiddleCopy * colorOrder.length + colorOrder.indexOf(value));
+  const selectedColor = useRef(value);
+  const pointer = useRef<{ id: number; y: number; time: number; velocity: number; dragged: boolean } | null>(null);
+  const animation = useRef<number | null>(null);
+  const settleTimer = useRef<number | null>(null);
+  const reduceMotion = useRef(false);
+  const [, forceFrame] = useState(0);
 
-  useLayoutEffect(() => {
-    const wheel = ref.current;
-    const middleIndex = wheelMiddleCopy * colorOrder.length + colorOrder.indexOf(value);
-    const active = wheel?.querySelector<HTMLButtonElement>(`[data-index="${middleIndex}"]`);
-    if (!wheel || !active) return;
-    suppressScroll.current = true;
-    active.scrollIntoView({ behavior: "auto", block: "center" });
-    window.setTimeout(() => {
-      suppressScroll.current = false;
-    }, 240);
-  }, [value]);
-
-  function updateFromScroll() {
-    if (suppressScroll.current) return;
-    const wheel = ref.current;
-    if (!wheel) return;
-    const wheelCenter = wheel.getBoundingClientRect().top + wheel.clientHeight / 2;
-    const items = Array.from(wheel.querySelectorAll<HTMLButtonElement>("[data-color]"));
-    const closest = items.reduce((best, item) => {
-      const rect = item.getBoundingClientRect();
-      const distance = Math.abs(rect.top + rect.height / 2 - wheelCenter);
-      return distance < best.distance ? { item, distance } : best;
-    }, { item: items[0], distance: Number.POSITIVE_INFINITY });
-    const color = closest.item?.dataset.color as TolexColor | undefined;
-    if (color && color !== value) onChange(slot, color);
-    if (settling.current) window.clearTimeout(settling.current);
-    settling.current = window.setTimeout(() => {
-      const index = Number(closest.item?.dataset.index ?? 0);
-      const colorIndex = index % colorOrder.length;
-      const middle = wheel.querySelector<HTMLButtonElement>(`[data-index="${wheelMiddleCopy * colorOrder.length + colorIndex}"]`);
-      if (index < colorOrder.length || index >= colorOrder.length * (wheelCopies - 1)) {
-        suppressScroll.current = true;
-        middle?.scrollIntoView({ behavior: "auto", block: "center" });
-        window.setTimeout(() => {
-          suppressScroll.current = false;
-        }, 80);
-        return;
-      }
-      closest.item?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 150);
+  function stopAnimation() {
+    if (animation.current !== null) window.cancelAnimationFrame(animation.current);
+    animation.current = null;
+    if (settleTimer.current !== null) window.clearTimeout(settleTimer.current);
+    settleTimer.current = null;
   }
 
+  function normalizedPosition(nextPosition: number) {
+    const setLength = colorOrder.length;
+    const low = setLength * (wheelMiddleCopy - 0.5);
+    const high = setLength * (wheelMiddleCopy + 1.5);
+    let normalized = nextPosition;
+    while (normalized < low) normalized += setLength;
+    while (normalized > high) normalized -= setLength;
+    return normalized;
+  }
+
+  function applyPosition(nextPosition: number, commit = true) {
+    position.current = normalizedPosition(nextPosition);
+    const centeredColor = colorOrder[wrapColorIndex(Math.round(position.current))];
+    if (centeredColor && centeredColor !== selectedColor.current) {
+      selectedColor.current = centeredColor;
+      if (commit) onChange(slot, centeredColor);
+    }
+    forceFrame((frame) => frame + 1);
+  }
+
+  function measureWheel() {
+    const wheel = ref.current;
+    const first = trackRef.current?.querySelector<HTMLButtonElement>("[data-index]");
+    const second = trackRef.current?.querySelector<HTMLButtonElement>('[data-index="1"]');
+    const track = trackRef.current;
+    if (!wheel || !track || !first) return;
+    trackInset.current = track.offsetTop;
+    itemHeight.current = first.offsetHeight || itemHeight.current;
+    if (second) {
+      itemPitch.current = Math.max(1, second.offsetTop - first.offsetTop);
+    } else {
+      itemPitch.current = itemHeight.current + 8;
+    }
+    applyPosition(position.current, false);
+  }
+
+  function settleTo(target: number, duration = wheelSnapDuration) {
+    stopAnimation();
+    const from = position.current;
+    const startedAt = performance.now();
+
+    const animate = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      applyPosition(from + (target - from) * easeOutCubic(progress));
+      if (progress < 1) {
+        animation.current = window.requestAnimationFrame(animate);
+        return;
+      }
+      applyPosition(target);
+      ref.current?.classList.add("settled");
+      settleTimer.current = window.setTimeout(() => ref.current?.classList.remove("settled"), 180);
+      animation.current = null;
+    };
+
+    animation.current = window.requestAnimationFrame(animate);
+  }
+
+  function startInertia(velocity: number) {
+    if (reduceMotion.current) {
+      settleTo(Math.round(position.current), 120);
+      return;
+    }
+
+    let currentVelocity = Math.max(-wheelMaxVelocity, Math.min(wheelMaxVelocity, velocity));
+    let lastTime = performance.now();
+
+    const coast = (now: number) => {
+      const elapsed = Math.min(32, now - lastTime);
+      lastTime = now;
+      applyPosition(position.current + (currentVelocity * elapsed) / itemPitch.current);
+      currentVelocity *= Math.pow(wheelFriction, elapsed / 16.67);
+
+      if (Math.abs(currentVelocity) > wheelVelocityThreshold) {
+        animation.current = window.requestAnimationFrame(coast);
+        return;
+      }
+
+      animation.current = null;
+      settleTo(Math.round(position.current));
+    };
+
+    animation.current = window.requestAnimationFrame(coast);
+  }
+
+  useLayoutEffect(() => {
+    reduceMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    measureWheel();
+    const onResize = () => measureWheel();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (value === selectedColor.current) return;
+    selectedColor.current = value;
+    position.current = wheelMiddleCopy * colorOrder.length + colorOrder.indexOf(value);
+    applyPosition(position.current, false);
+  }, [value]);
+
+  useEffect(() => () => stopAnimation(), []);
+
+  function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    event.preventDefault();
+    stopAnimation();
+    ref.current?.setPointerCapture(event.pointerId);
+    pointer.current = {
+      id: event.pointerId,
+      y: event.clientY,
+      time: event.timeStamp,
+      velocity: 0,
+      dragged: false,
+    };
+
+    const release = () => {
+      const activePointer = pointer.current;
+      if (!activePointer) return;
+      finishPointer(activePointer);
+    };
+    window.addEventListener("pointerup", release, { once: true });
+    window.addEventListener("mouseup", release, { once: true });
+    window.addEventListener("touchend", release, { once: true });
+  }
+
+  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const activePointer = pointer.current;
+    if (!activePointer || activePointer.id !== event.pointerId) return;
+    event.preventDefault();
+    const deltaY = event.clientY - activePointer.y;
+    const elapsed = Math.max(1, event.timeStamp - activePointer.time);
+    if (Math.abs(deltaY) > 2) activePointer.dragged = true;
+    applyPosition(position.current - deltaY / itemPitch.current);
+    const instantVelocity = -deltaY / elapsed;
+    activePointer.velocity = activePointer.velocity * 0.72 + instantVelocity * 0.28;
+    activePointer.y = event.clientY;
+    activePointer.time = event.timeStamp;
+  }
+
+  function finishPointer(activePointer: { velocity: number; dragged: boolean }) {
+    pointer.current = null;
+    if (activePointer.dragged) {
+      startInertia(activePointer.velocity);
+      return;
+    }
+    settleTo(Math.round(position.current), reduceMotion.current ? 120 : 180);
+  }
+
+  function handlePointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    const activePointer = pointer.current;
+    if (!activePointer || activePointer.id !== event.pointerId) return;
+    if (ref.current?.hasPointerCapture(event.pointerId)) ref.current.releasePointerCapture(event.pointerId);
+    finishPointer(activePointer);
+  }
+
+  function handleMouseUp() {
+    const activePointer = pointer.current;
+    if (!activePointer) return;
+    finishPointer(activePointer);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown" && event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    const direction = event.key === "ArrowUp" ? -1 : event.key === "ArrowDown" ? 1 : 0;
+    settleTo(Math.round(position.current) + direction, reduceMotion.current ? 120 : wheelSnapDuration);
+  }
+
+  const trackOffset = ref.current ? ref.current.clientHeight / 2 - itemHeight.current / 2 - trackInset.current - position.current * itemPitch.current : 0;
+  const activeIndex = Math.round(position.current);
+
   return (
-    <div className="colorWheel" role="listbox" aria-label={`Tolex layer ${slot + 1}`} onScroll={updateFromScroll} ref={ref}>
-      {loopedColors.map((color, index) => (
-        <button
-          aria-selected={value === color}
-          className={value === color ? "active" : ""}
-          data-color={color}
-          data-index={index}
-          key={`${color}-${index}`}
-          onClick={() => onChange(slot, color)}
-          style={{ backgroundColor: tolexColors[color].hex }}
-          title={tolexColors[color].label}
-        >
-          <span>{tolexColors[color].label}</span>
-        </button>
-      ))}
+    <div
+      className="colorWheel"
+      role="listbox"
+      aria-label={`Tolex layer ${slot + 1}`}
+      aria-activedescendant={`tolex-${slot}-${activeIndex}`}
+      onKeyDown={handleKeyDown}
+      onPointerCancel={handlePointerUp}
+      onPointerDown={handlePointerDown}
+      onLostPointerCapture={handleMouseUp}
+      onMouseUp={handleMouseUp}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      ref={ref}
+      tabIndex={0}
+    >
+      <div className="colorWheelTrack" ref={trackRef} style={{ transform: `translate3d(0, ${trackOffset}px, 0)` }}>
+        {loopedColors.map((color, index) => {
+          const distance = Math.min(4, Math.abs(index - position.current));
+          const scale = Math.max(0.68, 1.14 - distance * 0.15);
+          const opacity = Math.max(0.24, 1 - distance * 0.24);
+          const isActive = index === activeIndex;
+          return (
+            <button
+              aria-selected={isActive}
+              className={isActive ? "active" : ""}
+              data-color={color}
+              data-index={index}
+              id={`tolex-${slot}-${index}`}
+              key={`${color}-${index}`}
+              style={{ backgroundColor: tolexColors[color].hex, opacity, transform: `scale(${scale})` }}
+              title={tolexColors[color].label}
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                if (pointer.current?.dragged) return;
+                settleTo(index, reduceMotion.current ? 120 : wheelSnapDuration);
+              }}
+            >
+              <span>{tolexColors[color].label}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

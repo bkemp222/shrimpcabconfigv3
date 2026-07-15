@@ -2080,6 +2080,44 @@ video {
   overscroll-behavior: contain;
 }
 
+.colorWheel {
+  display: block;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  scroll-snap-type: none;
+  scroll-padding-block: 0;
+}
+
+.colorWheel:active {
+  cursor: grabbing;
+}
+
+.colorWheelTrack {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  will-change: transform;
+}
+
+.colorWheel button {
+  scroll-snap-align: none;
+  transition:
+    opacity 90ms ease,
+    outline-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.colorWheel button.active {
+  animation: none;
+}
+
+.colorWheel.settled button.active {
+  animation: tolexSettle 180ms ease-out;
+}
+
 .speakerPlate.needsHole .speakerHole {
   animation: holeCue 620ms ease-in-out 2;
 }
@@ -2161,10 +2199,28 @@ video {
   }
 }
 
+@keyframes tolexSettle {
+  0% {
+    transform: scale(1.08);
+  }
+
+  55% {
+    transform: scale(1.18);
+  }
+
+  100% {
+    transform: scale(1.14);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .speakerPlate.needsHole .speakerHole {
     animation: none;
     outline: 2px solid var(--accent);
+  }
+
+  .colorWheel.settled button.active {
+    animation: none;
   }
 }
 
