@@ -1221,8 +1221,7 @@ video {
 
 .previewPanel {
   position: relative;
-  display: grid;
-  place-items: center;
+  display: block;
   padding: 0;
   border-top: 0;
   border-bottom: clamp(8px, 1.4svh, 12px) solid var(--accent);
@@ -1274,8 +1273,12 @@ video {
   width: 100%;
   max-width: 100%;
   aspect-ratio: 1 / 1;
-  align-self: stretch;
-  justify-self: stretch;
+}
+
+.previewPanel > .cabinetRenderer {
+  position: absolute;
+  inset: 0;
+  height: 100%;
 }
 
 .renderLayer {

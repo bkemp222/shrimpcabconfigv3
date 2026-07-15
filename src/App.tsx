@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CabinetSize, Grill, Instrument, Livery, PipeColor, Speaker, TolexColor } from "./data/configuratorData";
 import {
   colorOrder,
@@ -191,12 +191,21 @@ function LiveryPanel() {
 function TolexWheel({ slot, value, onChange }: { slot: 0 | 1 | 2; value: TolexColor; onChange: (slot: 0 | 1 | 2, color: TolexColor) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const settling = useRef<number | null>(null);
+  const suppressScroll = useRef(false);
 
-  useEffect(() => {
-    ref.current?.querySelector<HTMLButtonElement>(`[data-color="${value}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  useLayoutEffect(() => {
+    const wheel = ref.current;
+    const active = wheel?.querySelector<HTMLButtonElement>(`[data-color="${value}"]`);
+    if (!wheel || !active) return;
+    suppressScroll.current = true;
+    active.scrollIntoView({ behavior: "auto", block: "center" });
+    window.setTimeout(() => {
+      suppressScroll.current = false;
+    }, 240);
   }, [value]);
 
   function updateFromScroll() {
+    if (suppressScroll.current) return;
     const wheel = ref.current;
     if (!wheel) return;
     const wheelCenter = wheel.getBoundingClientRect().top + wheel.clientHeight / 2;
