@@ -2307,7 +2307,7 @@ body,
   opacity: 0;
   color: var(--paper);
   font-family: var(--display);
-  font-size: clamp(1.18rem, 3.8vw, 1.7rem);
+  font-size: clamp(.9rem, 2.8vw, 1.3rem);
   line-height: 1.1;
   text-align: center;
   text-transform: uppercase;
