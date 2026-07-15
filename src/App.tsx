@@ -14,6 +14,7 @@ import {
   tolexColors,
 } from "./data/configuratorData";
 import { CabinetRenderer } from "./components/CabinetRenderer";
+import { assetPath } from "./data/assets";
 import { useConfigurator } from "./store/ConfiguratorContext";
 
 const tabs = ["size", "livery", "tolex", "grill", "trim"] as const;
@@ -26,7 +27,7 @@ function Header() {
         <strong>Build Your</strong>
         <span />
       </div>
-      <img src="/assets/shrimp_header logo.png" alt="Shrimp" />
+      <img src={assetPath("assets/shrimp_header logo.png")} alt="Shrimp" />
     </header>
   );
 }
@@ -45,7 +46,7 @@ function InstrumentSelection() {
   const { chooseInstrument } = useConfigurator();
   const option = (instrument: Instrument) => (
     <button className="instrumentPick" onClick={() => chooseInstrument(instrument)}>
-      <img src={`/assets/swatches/instruments/${instrument}_idle.png`} alt="" />
+      <img src={assetPath(`assets/swatches/instruments/${instrument}_idle.png`)} alt="" />
       <span>{instrument}</span>
     </button>
   );
@@ -53,7 +54,7 @@ function InstrumentSelection() {
   return (
     <main className="landingScreen">
       <div className="stageHero">
-        <img className="stageArt" src="/assets/instrument_select.png" alt="" />
+        <img className="stageArt" src={assetPath("assets/instrument_select.png")} alt="" />
         <div className="instrumentChoices">
           {option("bass")}
           {option("guitar")}

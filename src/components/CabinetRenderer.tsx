@@ -1,4 +1,5 @@
 import type { CabinetSize, Corner, Grill, Livery, PipeColor, SpeakerAssignment, TolexColor } from "../data/configuratorData";
+import { assetPath } from "../data/assets";
 import { grills, liveries, sizes, speakerLayouts, speakerOptions, tolexColors } from "../data/configuratorData";
 
 type Props = {
@@ -15,7 +16,7 @@ type Props = {
 };
 
 function liveryAsset(size: CabinetSize, livery: Livery, layer: string) {
-  return `/assets/${size}/svg/${livery}_${layer}.svg`;
+  return assetPath(`assets/${size}/svg/${livery}_${layer}.svg`);
 }
 
 export function CabinetRenderer({ instrument, size, livery, tolex, grill, grillPipe, corners, speakers = [], showSpeakers = false, compact = false }: Props) {
@@ -36,12 +37,12 @@ export function CabinetRenderer({ instrument, size, livery, tolex, grill, grillP
           }}
         />
       ))}
-      <img className="renderLayer" src={`/assets/${size}/piping/${livery}_${grillPipe}.png`} alt="" draggable={false} />
+      <img className="renderLayer" src={assetPath(`assets/${size}/piping/${livery}_${grillPipe}.png`)} alt="" draggable={false} />
       {instrument === "guitar" && (
         <>
-          <img className="renderLayer" src={`/assets/${size}/grills/${grills[grill].assetName}.png`} alt="" draggable={false} />
-          <img className="renderLayer" src={`/assets/${size}/piping/grill_${grillPipe}.png`} alt="" draggable={false} />
-          {corners === "chrome" && <img className="renderLayer" src={`/assets/${size}/corners/chrome.png`} alt="" draggable={false} />}
+          <img className="renderLayer" src={assetPath(`assets/${size}/grills/${grills[grill].assetName}.png`)} alt="" draggable={false} />
+          <img className="renderLayer" src={assetPath(`assets/${size}/piping/grill_${grillPipe}.png`)} alt="" draggable={false} />
+          {corners === "chrome" && <img className="renderLayer" src={assetPath(`assets/${size}/corners/chrome.png`)} alt="" draggable={false} />}
           {showSpeakers && size !== "210" && (
             <div className="speakerPreviewLayer">
               {(speakerLayouts[size as Exclude<CabinetSize, "210">] ?? []).map((pos, index) => {
