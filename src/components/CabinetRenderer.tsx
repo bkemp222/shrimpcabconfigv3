@@ -8,7 +8,8 @@ type Props = {
   livery: Livery;
   tolex: [TolexColor, TolexColor, TolexColor];
   grill: Grill;
-  grillPipe: PipeColor;
+  grillPiping: PipeColor;
+  liveryPiping: PipeColor;
   corners: Corner;
   speakers?: SpeakerAssignment[];
   showSpeakers?: boolean;
@@ -19,7 +20,7 @@ function liveryAsset(size: CabinetSize, livery: Livery, layer: string) {
   return assetPath(`assets/${size}/svg/${livery}_${layer}.svg`);
 }
 
-export function CabinetRenderer({ instrument, size, livery, tolex, grill, grillPipe, corners, speakers = [], showSpeakers = false, compact = false }: Props) {
+export function CabinetRenderer({ instrument, size, livery, tolex, grill, grillPiping, liveryPiping, corners, speakers = [], showSpeakers = false, compact = false }: Props) {
   const layerNames = liveries[livery].layers;
   const colors = layerNames.map((_, index) => tolexColors[tolex[index] ?? tolex[0]].hex);
 
@@ -37,11 +38,11 @@ export function CabinetRenderer({ instrument, size, livery, tolex, grill, grillP
           }}
         />
       ))}
-      <img className="renderLayer" src={assetPath(`assets/${size}/piping/${livery}_${grillPipe}.png`)} alt="" draggable={false} />
+      <img className="renderLayer" src={assetPath(`assets/${size}/piping/${livery}_${liveryPiping}.png`)} alt="" draggable={false} />
       {instrument === "guitar" && (
         <>
           <img className="renderLayer" src={assetPath(`assets/${size}/grills/${grills[grill].assetName}.png`)} alt="" draggable={false} />
-          <img className="renderLayer" src={assetPath(`assets/${size}/piping/grill_${grillPipe}.png`)} alt="" draggable={false} />
+          <img className="renderLayer" src={assetPath(`assets/${size}/piping/grill_${grillPiping}.png`)} alt="" draggable={false} />
           {corners === "chrome" && <img className="renderLayer" src={assetPath(`assets/${size}/corners/chrome.png`)} alt="" draggable={false} />}
           {showSpeakers && size !== "210" && (
             <div className="speakerPreviewLayer">

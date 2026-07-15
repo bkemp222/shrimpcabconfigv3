@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { CabinetSize, Grill, Instrument, Livery, PipeColor, Speaker, TolexColor } from "./data/configuratorData";
+import type { CabinetSize, Grill, Instrument, Livery, Speaker, TolexColor } from "./data/configuratorData";
 import {
   colorOrder,
   grills,
@@ -19,6 +19,9 @@ import { assetPath } from "./data/assets";
 import { useConfigurator } from "./store/ConfiguratorContext";
 
 const tabs = ["size", "livery", "tolex", "grill", "trim"] as const;
+const wheelCopies = 5;
+const wheelMiddleCopy = Math.floor(wheelCopies / 2);
+const loopedColors = Array.from({ length: wheelCopies }, () => colorOrder).flat();
 
 function scrollByPage(container: HTMLDivElement | null, direction: -1 | 1) {
   container?.scrollBy({ left: direction * container.clientWidth * 0.72, behavior: "smooth" });
@@ -31,6 +34,14 @@ function zoneStyle(zone: { x: number; y: number; width: number; height: number }
     width: `${(zone.width / 2000) * 100}%`,
     height: `${(zone.height / 2000) * 100}%`,
   };
+}
+
+function segmentButton(active: boolean, label: string, onClick: () => void) {
+  return (
+    <button className={active ? "active" : ""} type="button" aria-pressed={active} onClick={onClick}>
+      {label}
+    </button>
+  );
 }
 
 function HorizontalSelector({ className, children }: { className: string; children: React.ReactNode }) {
@@ -119,7 +130,8 @@ function PreviewPanel({ showSpeakers = false }: { showSpeakers?: boolean }) {
         livery={config.livery}
         tolex={config.tolex}
         grill={config.grill}
-        grillPipe={config.grillPipe}
+        grillPiping={config.grillPiping}
+        liveryPiping={config.liveryPiping}
         corners={config.corners}
         speakers={config.speakers}
         showSpeakers={showSpeakers}
@@ -195,7 +207,8 @@ function TolexWheel({ slot, value, onChange }: { slot: 0 | 1 | 2; value: TolexCo
 
   useLayoutEffect(() => {
     const wheel = ref.current;
-    const active = wheel?.querySelector<HTMLButtonElement>(`[data-color="${value}"]`);
+    const middleIndex = wheelMiddleCopy * colorOrder.length + colorOrder.indexOf(value);
+    const active = wheel?.querySelector<HTMLButtonElement>(`[data-index="${middleIndex}"]`);
     if (!wheel || !active) return;
     suppressScroll.current = true;
     active.scrollIntoView({ behavior: "auto", block: "center" });
@@ -219,18 +232,30 @@ function TolexWheel({ slot, value, onChange }: { slot: 0 | 1 | 2; value: TolexCo
     if (color && color !== value) onChange(slot, color);
     if (settling.current) window.clearTimeout(settling.current);
     settling.current = window.setTimeout(() => {
+      const index = Number(closest.item?.dataset.index ?? 0);
+      const colorIndex = index % colorOrder.length;
+      const middle = wheel.querySelector<HTMLButtonElement>(`[data-index="${wheelMiddleCopy * colorOrder.length + colorIndex}"]`);
+      if (index < colorOrder.length || index >= colorOrder.length * (wheelCopies - 1)) {
+        suppressScroll.current = true;
+        middle?.scrollIntoView({ behavior: "auto", block: "center" });
+        window.setTimeout(() => {
+          suppressScroll.current = false;
+        }, 80);
+        return;
+      }
       closest.item?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 120);
+    }, 150);
   }
 
   return (
     <div className="colorWheel" role="listbox" aria-label={`Tolex layer ${slot + 1}`} onScroll={updateFromScroll} ref={ref}>
-      {colorOrder.map((color) => (
+      {loopedColors.map((color, index) => (
         <button
           aria-selected={value === color}
           className={value === color ? "active" : ""}
           data-color={color}
-          key={color}
+          data-index={index}
+          key={`${color}-${index}`}
           onClick={() => onChange(slot, color)}
           style={{ backgroundColor: tolexColors[color].hex }}
           title={tolexColors[color].label}
@@ -280,7 +305,7 @@ function GrillPanel() {
 }
 
 function TrimPanel() {
-  const { config, setGrillPipe, setCorners } = useConfigurator();
+  const { config, setGrillPiping, setLiveryPiping, setCorners } = useConfigurator();
   if (config.instrument === "bass") {
     return (
       <div className="fixedPanel">
@@ -290,27 +315,28 @@ function TrimPanel() {
     );
   }
 
-  const trimChoice = (type: "pipe" | "corner", value: PipeColor | "chrome", label: string) => {
-    const active = type === "pipe" ? config.grillPipe === value : config.corners === value;
-    return (
-      <OptionButton
-        active={active}
-        onClick={() => (type === "pipe" ? setGrillPipe(value as PipeColor) : setCorners(value as "black" | "chrome"))}
-        label={label}
-      >
-        <span className={`materialDot ${value}`} />
-      </OptionButton>
-    );
-  };
   return (
     <div className="trimPanel">
-      <section>
+      <section className="trimSegmentRow">
         <h3>Grill Trim</h3>
-        <div className="trimChoices">{trimChoice("pipe", "black", "Black")}{trimChoice("pipe", "white", "White")}</div>
+        <div className="segmentedControl">
+          {segmentButton(config.grillPiping === "black", "Black", () => setGrillPiping("black"))}
+          {segmentButton(config.grillPiping === "white", "White", () => setGrillPiping("white"))}
+        </div>
       </section>
-      <section>
+      <section className="trimSegmentRow">
+        <h3>Livery Trim</h3>
+        <div className="segmentedControl">
+          {segmentButton(config.liveryPiping === "black", "Black", () => setLiveryPiping("black"))}
+          {segmentButton(config.liveryPiping === "white", "White", () => setLiveryPiping("white"))}
+        </div>
+      </section>
+      <section className="trimSegmentRow">
         <h3>Corners</h3>
-        <div className="trimChoices">{trimChoice("corner", "black", "Black")}{trimChoice("corner", "chrome", "Chrome")}</div>
+        <div className="segmentedControl">
+          {segmentButton(config.corners === "black", "Black", () => setCorners("black"))}
+          {segmentButton(config.corners === "chrome", "Chrome", () => setCorners("chrome"))}
+        </div>
       </section>
     </div>
   );
@@ -350,11 +376,13 @@ function SpeakerSelection() {
   const { config, back, next, setSpeaker } = useConfigurator();
   const [selectedHole, setSelectedHole] = useState<number | null>(null);
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker>("creamback");
+  const [needsHole, setNeedsHole] = useState(false);
   if (!config.size || config.size === "210") return null;
 
   const handleDrop = (index: number, speaker: Speaker) => {
     setSpeaker(index, speaker);
     setSelectedHole(null);
+    setNeedsHole(false);
   };
   const layout = speakerLayouts[config.size as Exclude<CabinetSize, "210">];
 
@@ -365,7 +393,7 @@ function SpeakerSelection() {
           <NavButton direction="back" onClick={back}>Back</NavButton>
           <NavButton direction="next" onClick={next}>Next</NavButton>
         </div>
-        <div className="speakerPlate">
+        <div className={`speakerPlate ${needsHole ? "needsHole" : ""}`}>
           <img src={speakerPlateAssets[config.size as Exclude<CabinetSize, "210">]} alt="" />
           {Array.from({ length: sizes[config.size].speakerCount }).map((_, index) => (
             <button
@@ -374,7 +402,12 @@ function SpeakerSelection() {
               key={layout[index].id}
               onDragOver={(event) => event.preventDefault()}
               onDrop={(event) => handleDrop(index, event.dataTransfer.getData("speaker") as Speaker)}
-              onPointerUp={() => setSelectedHole(index)}
+              onPointerUp={() => {
+                setSelectedHole(index);
+                setNeedsHole(false);
+              }}
+              aria-label={`Speaker position ${index + 1}${config.speakers[index] ? `, ${speakerOptions[config.speakers[index] as Speaker].label}` : ", unloaded"}`}
+              aria-pressed={selectedHole === index}
             >
               {config.speakers[index] ? <img src={speakerOptions[config.speakers[index] as Speaker].asset} alt="" /> : <span />}
             </button>
@@ -382,7 +415,7 @@ function SpeakerSelection() {
         </div>
       </section>
       <section className="speakerChooser">
-        <p>Drag into an opening, or tap an empty opening then choose a speaker.</p>
+        <p className={needsHole ? "speakerCue" : ""}>{needsHole ? "Choose a speaker position first." : "Select a position, then tap a speaker. Dragging also works."}</p>
         <HorizontalSelector className="speakerOptions">
           {speakerOrder.map((speaker) => (
             <button
@@ -394,11 +427,16 @@ function SpeakerSelection() {
                 event.dataTransfer.setData("speaker", speaker);
               }}
               onClick={() => {
-                const emptyIndex = config.speakers.findIndex((item) => !item);
-                const targetIndex = selectedHole ?? (emptyIndex === -1 ? 0 : emptyIndex);
                 setSelectedSpeaker(speaker);
+                if (selectedHole === null) {
+                  setNeedsHole(true);
+                  window.setTimeout(() => setNeedsHole(false), 1400);
+                  return;
+                }
+                const targetIndex = selectedHole;
                 setSpeaker(targetIndex, speaker);
                 setSelectedHole(null);
+                setNeedsHole(false);
               }}
             >
               <strong>{speakerOptions[speaker].label}</strong>
@@ -427,8 +465,9 @@ function ReviewScreen() {
           size={config.size}
           livery={config.livery}
           tolex={config.tolex}
-          grill={config.grill}
-          grillPipe={config.grillPipe}
+        grill={config.grill}
+          grillPiping={config.grillPiping}
+          liveryPiping={config.liveryPiping}
           corners={config.corners}
           speakers={config.speakers}
         />
@@ -441,7 +480,8 @@ function ReviewScreen() {
           <dt>Livery</dt><dd>{liveries[config.livery].label}</dd>
           <dt>Tolex</dt><dd>{config.tolex.slice(0, liverySlots).map((color, index) => `Layer ${index + 1}: ${tolexColors[color].label}`).join(" / ")}</dd>
           <dt>Grill</dt><dd>{isGuitar ? grills[config.grill].label : "Black powder-coated aluminum"}</dd>
-          <dt>Grill Piping</dt><dd>{isGuitar ? config.grillPipe : "Fixed"}</dd>
+          <dt>Grill Trim</dt><dd>{isGuitar ? config.grillPiping : "Fixed"}</dd>
+          <dt>Livery Trim</dt><dd>{isGuitar ? config.liveryPiping : "Fixed"}</dd>
           <dt>Corners</dt><dd>{isGuitar ? config.corners : "Fixed"}</dd>
           <dt>Speakers</dt>
           <dd>
@@ -462,7 +502,7 @@ function ReviewScreen() {
 export function App() {
   const { config } = useConfigurator();
   return (
-    <div className="app">
+    <div className={`app ${config.screen === "review" ? "reviewMode" : ""}`}>
       <Header />
       {config.screen === "instrument" && <InstrumentSelection />}
       {config.screen === "configurator" && <ConfiguratorScreen />}

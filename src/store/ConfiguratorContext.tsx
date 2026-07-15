@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type {
   CabinetSize,
   Corner,
@@ -20,7 +20,8 @@ export type ConfiguratorState = {
   livery: Livery;
   tolex: [TolexColor, TolexColor, TolexColor];
   grill: Grill;
-  grillPipe: PipeColor;
+  grillPiping: PipeColor;
+  liveryPiping: PipeColor;
   corners: Corner;
   speakers: SpeakerAssignment[];
 };
@@ -34,7 +35,8 @@ type ConfiguratorContextValue = {
   setLivery: (livery: Livery) => void;
   setTolex: (slot: 0 | 1 | 2, color: TolexColor) => void;
   setGrill: (grill: Grill) => void;
-  setGrillPipe: (color: PipeColor) => void;
+  setGrillPiping: (color: PipeColor) => void;
+  setLiveryPiping: (color: PipeColor) => void;
   setCorners: (corner: Corner) => void;
   setSpeaker: (index: number, speaker: SpeakerAssignment) => void;
   next: () => void;
@@ -50,19 +52,49 @@ const initialState: ConfiguratorState = {
   livery: "nitro",
   tolex: ["apple_green", "purple", "black"],
   grill: "blackbasket",
-  grillPipe: "white",
+  grillPiping: "white",
+  liveryPiping: "white",
   corners: "black",
   speakers: [],
 };
 
 const Context = createContext<ConfiguratorContextValue | null>(null);
+const STORAGE_KEY = "build-your-shrimp-v3-config";
 
 function buildSpeakers(size: CabinetSize) {
   return Array.from({ length: sizes[size].speakerCount }, () => null);
 }
 
+function migrateConfig(saved: unknown): ConfiguratorState {
+  if (!saved || typeof saved !== "object") return initialState;
+  const source = saved as Partial<ConfiguratorState> & { grillPipe?: PipeColor };
+  const sharedPipe = source.grillPipe ?? "white";
+  return {
+    ...initialState,
+    ...source,
+    grillPiping: source.grillPiping ?? sharedPipe,
+    liveryPiping: source.liveryPiping ?? sharedPipe,
+  };
+}
+
+function loadInitialState() {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? migrateConfig(JSON.parse(raw)) : initialState;
+  } catch {
+    return initialState;
+  }
+}
+
 export function ConfiguratorProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<ConfiguratorState>(initialState);
+  const [config, setConfig] = useState<ConfiguratorState>(loadInitialState);
+
+  useEffect(() => {
+    const save = window.setTimeout(() => {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    }, 220);
+    return () => window.clearTimeout(save);
+  }, [config]);
 
   const value = useMemo<ConfiguratorContextValue>(
     () => ({
@@ -97,7 +129,8 @@ export function ConfiguratorProvider({ children }: { children: ReactNode }) {
           return { ...current, tolex: nextTolex };
         }),
       setGrill: (grill) => setConfig((current) => ({ ...current, grill })),
-      setGrillPipe: (grillPipe) => setConfig((current) => ({ ...current, grillPipe })),
+      setGrillPiping: (grillPiping) => setConfig((current) => ({ ...current, grillPiping })),
+      setLiveryPiping: (liveryPiping) => setConfig((current) => ({ ...current, liveryPiping })),
       setCorners: (corners) => setConfig((current) => ({ ...current, corners })),
       setSpeaker: (index, speaker) =>
         setConfig((current) => {
