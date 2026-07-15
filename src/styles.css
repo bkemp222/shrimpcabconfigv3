@@ -2188,14 +2188,19 @@ body,
   position: fixed;
   inset: 0;
   z-index: 1000;
-  width: 100vw;
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+  height: 100dvh;
+  min-height: 0;
+
   overflow: hidden;
   background: #050505;
   color: var(--paper);
+
   opacity: 1;
   transition: opacity 460ms ease;
 }
@@ -2206,11 +2211,18 @@ body,
 }
 
 .startupPreloaderInner {
-  display: grid;
-  justify-items: center;
-  gap: clamp(18px, 4vh, 28px);
-  width: min(86vw, 520px);
+  width: min(calc(100% - 48px), 520px);
+  margin: 0 auto;
   padding: 24px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 4vh, 28px);
+
+  text-align: center;
+
   transform: scale(1);
   transition: transform 460ms ease;
 }
@@ -2222,7 +2234,6 @@ body,
 .startupPreloaderIcon {
   width: clamp(78px, 19vw, 132px);
   height: auto;
-  align-items: center;
   transform-origin: 50% 50%;
   filter: drop-shadow(0 8px 16px rgba(240, 82, 91, 0.22));
 }
@@ -2232,17 +2243,19 @@ body,
 }
 
 .startupPreloaderMessage {
-  width: min(86vw, 420px);
+  width: 100%;
+  max-width: 420px;
   min-height: 1.45em;
   margin: 0;
+
   opacity: 0;
   color: var(--paper);
   font-family: var(--display);
   font-size: clamp(1.18rem, 3.8vw, 1.7rem);
   line-height: 1.1;
-  letter-spacing: 0;
   text-align: center;
   text-transform: uppercase;
+
   transition: opacity 180ms ease;
 }
 
