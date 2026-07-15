@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { CabinetSize, Grill, Instrument, Livery, PipeColor, Speaker, TolexColor } from "./data/configuratorData";
 import {
   colorOrder,
@@ -285,37 +286,40 @@ function ConfiguratorTab() {
 
 function SpeakerSelection() {
   const { config, back, next, setSpeaker } = useConfigurator();
+  const [selectedHole, setSelectedHole] = useState<number | null>(null);
   if (!config.size || config.size === "210") return null;
 
-  const handleDrop = (index: number, speaker: Speaker) => setSpeaker(index, speaker);
+  const handleDrop = (index: number, speaker: Speaker) => {
+    setSpeaker(index, speaker);
+    setSelectedHole(null);
+  };
   const layout = speakerLayouts[config.size as Exclude<CabinetSize, "210">];
 
   return (
     <main className="speakerScreen">
       <section className="speakerTop">
-        <NavButton direction="back" onClick={back}>Back</NavButton>
+        <div className="previewControls speakerControls">
+          <NavButton direction="back" onClick={back}>Back</NavButton>
+          <NavButton direction="next" onClick={next}>Next</NavButton>
+        </div>
         <div className="speakerPlate">
           <img src={speakerPlateAssets[config.size as Exclude<CabinetSize, "210">]} alt="" />
           {Array.from({ length: sizes[config.size].speakerCount }).map((_, index) => (
             <button
-              className="speakerHole"
+              className={`speakerHole ${selectedHole === index ? "selected" : ""}`}
               style={{ left: `${layout[index].x}%`, top: `${layout[index].y}%` }}
               key={index}
               onDragOver={(event) => event.preventDefault()}
               onDrop={(event) => handleDrop(index, event.dataTransfer.getData("speaker") as Speaker)}
-              onPointerUp={() => {
-                if (!config.speakers[index]) setSpeaker(index, "creamback");
-              }}
+              onPointerUp={() => setSelectedHole(index)}
             >
               {config.speakers[index] ? <img src={speakerOptions[config.speakers[index] as Speaker].asset} alt="" /> : <span />}
             </button>
           ))}
         </div>
-        <NavButton direction="next" onClick={next}>Next</NavButton>
       </section>
       <section className="speakerChooser">
-        <h1>Choose Your Speakers</h1>
-        <p>Drag a speaker into an opening, or tap an empty opening for Creamback.</p>
+        <p>Drag into an opening, or tap an empty opening then choose a speaker.</p>
         <div className="speakerOptions">
           {speakerOrder.map((speaker) => (
             <button
@@ -324,7 +328,9 @@ function SpeakerSelection() {
               onDragStart={(event) => event.dataTransfer.setData("speaker", speaker)}
               onClick={() => {
                 const emptyIndex = config.speakers.findIndex((item) => !item);
-                setSpeaker(emptyIndex === -1 ? 0 : emptyIndex, speaker);
+                const targetIndex = selectedHole ?? (emptyIndex === -1 ? 0 : emptyIndex);
+                setSpeaker(targetIndex, speaker);
+                setSelectedHole(null);
               }}
             >
               <strong>{speakerOptions[speaker].label}</strong>

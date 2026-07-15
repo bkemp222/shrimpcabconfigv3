@@ -1052,3 +1052,528 @@ button {
   font-weight: 900;
   text-transform: uppercase;
 }
+
+/* Targeted responsive-layout pass: fixed mobile screens with one shared square stage. */
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  min-width: 0;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+.app {
+  --header-h: clamp(78px, 12svh, 118px);
+  width: 100%;
+  height: 100svh;
+  height: 100dvh;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: var(--header-h) minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.brandHeader {
+  height: var(--header-h);
+}
+
+.brandHeader img {
+  object-fit: cover;
+}
+
+.landingScreen,
+.workbench,
+.speakerScreen {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.landingScreen {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  background: #050505;
+}
+
+.stageHero,
+.previewPanel,
+.speakerTop {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+.stageHero {
+  position: relative;
+  background: #0f0d12;
+  border-top: clamp(8px, 1.4svh, 12px) solid var(--accent);
+  border-bottom: 0;
+}
+
+.stageArt {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.instrumentChoices {
+  inset: auto clamp(14px, 6vw, 34px) clamp(12px, 4vw, 26px);
+  align-items: end;
+  pointer-events: none;
+}
+
+.instrumentPick {
+  min-width: clamp(104px, 30vw, 160px);
+  min-height: 76px;
+  gap: 4px;
+  padding: 7px 9px 6px;
+  border-radius: 7px;
+  color: var(--paper);
+  background: linear-gradient(to bottom, rgba(5, 5, 5, 0.1), rgba(5, 5, 5, 0.72));
+  font-family: var(--sans);
+  font-size: clamp(0.78rem, 3vw, 1.05rem);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 2px 4px #000;
+  pointer-events: auto;
+}
+
+.instrumentPick img {
+  width: clamp(54px, 15vw, 76px);
+}
+
+.chooserBand {
+  min-height: 0;
+  height: clamp(34px, 5.8svh, 46px);
+  gap: clamp(8px, 3vw, 18px);
+  padding: 0 12px;
+  border-top: clamp(8px, 1.4svh, 12px) solid var(--accent);
+  border-bottom: clamp(8px, 1.4svh, 12px) solid var(--accent);
+}
+
+.chooserBand h3 {
+  margin: 0;
+  color: var(--paper);
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-family: var(--sans);
+  font-size: clamp(0.86rem, 3.3vw, 1.15rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.upIcon {
+  border-left-width: 7px;
+  border-right-width: 7px;
+  border-bottom-width: 8px;
+}
+
+.disclaimer {
+  min-height: 0;
+  padding: clamp(8px, 1.8svh, 14px) clamp(16px, 5vw, 32px);
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  overflow: hidden;
+  background: var(--paper);
+  font-family: var(--sans);
+  font-size: clamp(0.72rem, 2.45vw, 0.95rem);
+  line-height: 1.22;
+}
+
+.disclaimer h4 {
+  margin: 0;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-family: var(--sans);
+  font-size: clamp(0.8rem, 2.8vw, 1.05rem);
+  font-style: normal;
+  line-height: 1.05;
+}
+
+.disclaimer p {
+  margin: 0;
+}
+
+.workbench {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  background: var(--paper);
+}
+
+.previewPanel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-top: 0;
+  border-bottom: clamp(8px, 1.4svh, 12px) solid var(--accent);
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255, 79, 93, 0.2), transparent 38%),
+    linear-gradient(145deg, #211d25 0%, #0b0a0d 65%);
+}
+
+.previewControls,
+.speakerControls {
+  position: absolute;
+  inset: clamp(8px, 2.4vw, 14px) clamp(10px, 3vw, 18px) auto;
+  padding: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.previewControls > *,
+.speakerControls > * {
+  pointer-events: auto;
+}
+
+.navButton,
+.startOver {
+  min-width: 84px;
+  min-height: 44px;
+  padding: 8px clamp(10px, 3vw, 16px);
+  gap: 8px;
+  border-radius: 6px;
+  font-size: clamp(0.86rem, 3.4vw, 1.15rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.arrowIcon.left {
+  border-top-width: 8px;
+  border-bottom-width: 8px;
+  border-right-width: 12px;
+}
+
+.arrowIcon.right {
+  border-top-width: 8px;
+  border-bottom-width: 8px;
+  border-left-width: 12px;
+}
+
+.cabinetRenderer,
+.cabinetRendererCompact {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  align-self: stretch;
+  justify-self: stretch;
+}
+
+.renderLayer {
+  object-fit: contain;
+}
+
+.controlDock {
+  min-height: 0;
+  max-height: none;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 3px;
+  padding: 5px 5px 0;
+  overflow: hidden;
+  background: var(--accent);
+}
+
+.tabs button {
+  min-width: 0;
+  min-height: clamp(38px, 5.6svh, 50px);
+  padding: 4px 2px;
+  border-radius: 5px 5px 0 0;
+  flex: initial;
+  white-space: nowrap;
+  font-size: clamp(0.73rem, 3vw, 0.98rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.optionGrid,
+.tolexPanel,
+.trimPanel,
+.fixedPanel {
+  min-height: 0;
+  height: 100%;
+  padding: clamp(8px, 1.7svh, 14px) clamp(8px, 2.8vw, 16px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.optionGrid::-webkit-scrollbar,
+.tolexPanel::-webkit-scrollbar,
+.trimPanel::-webkit-scrollbar,
+.speakerOptions::-webkit-scrollbar {
+  display: none;
+}
+
+.optionGrid {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(clamp(82px, 26vw, 120px), 1fr);
+  gap: clamp(7px, 2vw, 12px);
+  scroll-snap-type: x proximity;
+}
+
+.sizeGrid {
+  grid-auto-columns: minmax(clamp(92px, 27vw, 120px), 1fr);
+}
+
+.threeGrid,
+.grillGrid {
+  grid-auto-columns: minmax(clamp(92px, 28vw, 124px), 1fr);
+}
+
+.optionCard {
+  min-width: 0;
+  min-height: clamp(72px, 13svh, 112px);
+  padding: 7px 6px;
+  gap: 5px;
+  border-width: 3px;
+  border-radius: 6px;
+  scroll-snap-align: start;
+  font-size: clamp(0.68rem, 2.45vw, 0.9rem);
+  line-height: 1;
+}
+
+.optionCard img {
+  width: clamp(42px, 9svh, 64px);
+}
+
+.tolexPanel {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(6px, 2vw, 10px);
+}
+
+.tolexSlot {
+  gap: 5px;
+}
+
+.colorWheel {
+  width: min(100%, 78px);
+  height: clamp(68px, 10svh, 88px);
+}
+
+.colorWheel button {
+  width: clamp(38px, 7.5svh, 50px);
+  border-width: 2px;
+}
+
+.colorWheel button.active {
+  outline-width: 3px;
+  outline-offset: 2px;
+}
+
+.bigSwatch,
+.materialDot {
+  width: clamp(38px, 7.4svh, 54px);
+  border-width: 3px;
+  border-radius: 8px;
+}
+
+.lockBadge {
+  min-height: clamp(68px, 10svh, 88px);
+}
+
+.trimPanel {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 3vw, 18px);
+}
+
+.trimPanel section {
+  gap: 8px;
+  min-width: 0;
+}
+
+.trimChoices {
+  gap: 8px;
+}
+
+.fixedPanel {
+  min-height: 0;
+}
+
+.fixedPanel h2 {
+  font-size: clamp(0.95rem, 3.5vw, 1.25rem);
+}
+
+.fixedPanel p,
+.fixedNote {
+  font-size: clamp(0.74rem, 2.5vw, 0.95rem);
+}
+
+.speakerScreen {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.speakerTop {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  gap: 0;
+  padding: 0;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255, 79, 93, 0.18), transparent 38%),
+    linear-gradient(145deg, #211d25 0%, #0b0a0d 65%);
+  border-bottom: clamp(8px, 1.4svh, 12px) solid var(--accent);
+}
+
+.speakerPlate {
+  position: relative;
+  grid-column: auto;
+  grid-row: auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0;
+}
+
+.speakerPlate > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.speakerHole {
+  width: 31%;
+  min-height: 44px;
+}
+
+.speakerHole:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.speakerHole.selected {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  background: rgba(255, 79, 93, 0.14);
+}
+
+.speakerChooser {
+  min-height: 0;
+  padding: clamp(7px, 1.5svh, 12px) 0 clamp(8px, 1.7svh, 14px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(6px, 1.5svh, 10px);
+  overflow: hidden;
+  border-top: 0;
+}
+
+.speakerChooser p {
+  margin: 0;
+  padding-inline: 14px;
+  font-size: clamp(0.68rem, 2.35vw, 0.9rem);
+  line-height: 1.1;
+}
+
+.speakerOptions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(116px, 39vw, 164px);
+  grid-template-columns: none;
+  gap: clamp(8px, 3vw, 14px);
+  align-items: stretch;
+  padding: 0 clamp(16px, 6vw, 30px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.speakerOptions button {
+  min-width: 0;
+  min-height: 0;
+  padding: 4px 4px 6px;
+  gap: 3px;
+  border-radius: 8px;
+  scroll-snap-align: center;
+  font-size: clamp(0.64rem, 2.35vw, 0.84rem);
+  line-height: 1;
+}
+
+.speakerOptions button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.speakerOptions img {
+  width: clamp(62px, 16svh, 96px);
+}
+
+.speakerOptions span {
+  font-size: 0.9em;
+}
+
+@media (max-width: 380px), (max-height: 760px) {
+  .app {
+    --header-h: clamp(68px, 11svh, 92px);
+  }
+
+  .instrumentPick {
+    min-width: 96px;
+  }
+
+  .instrumentPick img {
+    width: clamp(48px, 13vw, 60px);
+  }
+
+  .chooserBand {
+    height: 32px;
+    border-top-width: 7px;
+    border-bottom-width: 7px;
+  }
+
+  .tabs button {
+    min-height: 36px;
+    font-size: clamp(0.66rem, 2.8vw, 0.82rem);
+  }
+
+  .optionCard {
+    min-height: clamp(64px, 11.5svh, 88px);
+  }
+}
+
+@media (min-width: 760px) {
+  .app {
+    --header-h: clamp(96px, 12svh, 150px);
+  }
+
+  .landingScreen,
+  .workbench,
+  .speakerScreen {
+    max-width: min(100%, 760px);
+    margin: 0 auto;
+  }
+
+  .stageHero,
+  .previewPanel,
+  .speakerTop {
+    max-height: min(100%, 760px);
+  }
+}
