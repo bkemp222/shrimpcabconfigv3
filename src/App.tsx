@@ -260,7 +260,7 @@ function InstrumentSelection() {
       </section>
       <section className="disclaimer">
         <h4>Super Technical and Critical Disclaimer</h4>
-        <p>The renders are digital and our cabs are real. Colors, patterns, textures, and stage vibes may vary when the amp gets loud.</p>
+        <p>The renders are digital and our cabs are real. Colors, patterns, textures, and stage vibes may differ slightly in person.</p>
       </section>
     </main>
   );
