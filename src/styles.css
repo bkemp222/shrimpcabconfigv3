@@ -1121,7 +1121,7 @@ video {
 .stageHero {
   position: relative;
   background: #0f0d12;
-  border-top: clamp(8px, 1.4svh, 12px) solid var(--accent);
+  border-top: 0;
   border-bottom: 0;
 }
 
@@ -1163,8 +1163,8 @@ video {
   height: clamp(34px, 5.8svh, 46px);
   gap: clamp(8px, 3vw, 18px);
   padding: 0 12px;
-  border-top: clamp(8px, 1.4svh, 12px) solid var(--accent);
-  border-bottom: clamp(8px, 1.4svh, 12px) solid var(--accent);
+  border-top: clamp(4px, 1.4svh, 12px) solid var(--accent);
+  border-bottom: clamp(4px, 1.4svh, 12px) solid var(--accent);
 }
 
 .chooserBand h3 {
