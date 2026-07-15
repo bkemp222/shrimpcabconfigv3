@@ -29,6 +29,13 @@ export type TolexColor =
   | "red";
 export type Speaker = "v30" | "creamback" | "greenback";
 export type SpeakerAssignment = Speaker | null;
+export type SpeakerZone = {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 export const tolexColors: Record<TolexColor, { label: string; hex: string; vendor: string; style: string; swatch: string }> = {
   black: { label: "Black", hex: "#222222", vendor: "SBS", style: "Levant", swatch: assetPath("assets/swatches/colors/black.png") },
@@ -78,9 +85,9 @@ export const grills: Record<Grill, { label: string; assetName: string; swatch: s
 };
 
 export const speakerOptions: Record<Speaker, { label: string; tone: string; asset: string }> = {
-  v30: { label: "Vintage 30", tone: "Aggressive", asset: assetPath("assets/speakers/v30.svg") },
-  creamback: { label: "Creamback 65", tone: "Balanced", asset: assetPath("assets/speakers/creamback.svg") },
-  greenback: { label: "Greenback 25", tone: "Vintage", asset: assetPath("assets/speakers/greenback.svg") },
+  v30: { label: "Vintage 30", tone: "Aggressive", asset: assetPath("assets/speakers/v30_1.png") },
+  creamback: { label: "Creamback 65", tone: "Balanced", asset: assetPath("assets/speakers/creamback_1.png") },
+  greenback: { label: "Greenback 25", tone: "Vintage", asset: assetPath("assets/speakers/greenback_1.png") },
 };
 
 export const guitarSizes: CabinetSize[] = ["112", "212h", "212v", "412"];
@@ -88,27 +95,36 @@ export const liveryOrder: Livery[] = ["tiger", "nitro", "shock"];
 export const grillOrder: Grill[] = ["agedsilver", "blackbasket", "fendersilver", "oxblood", "saltpepper", "smallcane"];
 export const speakerOrder: Speaker[] = ["v30", "creamback", "greenback"];
 
-export const speakerLayouts: Record<Exclude<CabinetSize, "210">, { x: number; y: number }[]> = {
-  "112": [{ x: 50, y: 50 }],
+const speakerHoleSize = 488;
+const speakerZone = (id: string, centerX: number, centerY: number): SpeakerZone => ({
+  id,
+  x: centerX - speakerHoleSize / 2,
+  y: centerY - speakerHoleSize / 2,
+  width: speakerHoleSize,
+  height: speakerHoleSize,
+});
+
+export const speakerLayouts: Record<Exclude<CabinetSize, "210">, SpeakerZone[]> = {
+  "112": [speakerZone("center", 1000, 1000)],
   "212h": [
-    { x: 36, y: 50 },
-    { x: 64, y: 50 },
+    speakerZone("left", 720, 1000),
+    speakerZone("right", 1280, 1000),
   ],
   "212v": [
-    { x: 50, y: 34 },
-    { x: 50, y: 66 },
+    speakerZone("top", 1000, 680),
+    speakerZone("bottom", 1000, 1320),
   ],
   "412": [
-    { x: 36, y: 36 },
-    { x: 64, y: 36 },
-    { x: 36, y: 64 },
-    { x: 64, y: 64 },
+    speakerZone("top-left", 720, 720),
+    speakerZone("top-right", 1280, 720),
+    speakerZone("bottom-left", 720, 1280),
+    speakerZone("bottom-right", 1280, 1280),
   ],
 };
 
 export const speakerPlateAssets: Record<Exclude<CabinetSize, "210">, string> = {
-  "112": assetPath("assets/speakers/112_speakers.svg"),
-  "212h": assetPath("assets/speakers/212h_speakers.svg"),
-  "212v": assetPath("assets/speakers/212v_speakers.svg"),
-  "412": assetPath("assets/speakers/412_speakers.svg"),
+  "112": assetPath("assets/speakers/112_speakers_1.png"),
+  "212h": assetPath("assets/speakers/212h_speakers_1.png"),
+  "212v": assetPath("assets/speakers/212v_speakers_1.png"),
+  "412": assetPath("assets/speakers/412_speakers_1.png"),
 };

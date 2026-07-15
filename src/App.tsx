@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CabinetSize, Grill, Instrument, Livery, PipeColor, Speaker, TolexColor } from "./data/configuratorData";
 import {
   colorOrder,
@@ -20,10 +20,34 @@ import { useConfigurator } from "./store/ConfiguratorContext";
 
 const tabs = ["size", "livery", "tolex", "grill", "trim"] as const;
 
-function wheelColors(activeColor: TolexColor) {
-  const activeIndex = colorOrder.indexOf(activeColor);
-  const start = Math.max(0, activeIndex - 1);
-  return [...colorOrder.slice(start), ...colorOrder.slice(0, start)];
+function scrollByPage(container: HTMLDivElement | null, direction: -1 | 1) {
+  container?.scrollBy({ left: direction * container.clientWidth * 0.72, behavior: "smooth" });
+}
+
+function zoneStyle(zone: { x: number; y: number; width: number; height: number }) {
+  return {
+    left: `${(zone.x / 2000) * 100}%`,
+    top: `${(zone.y / 2000) * 100}%`,
+    width: `${(zone.width / 2000) * 100}%`,
+    height: `${(zone.height / 2000) * 100}%`,
+  };
+}
+
+function HorizontalSelector({ className, children }: { className: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <div className="horizontalSelector">
+      <button className="selectorArrow selectorArrowLeft" type="button" aria-label="Previous options" onClick={() => scrollByPage(ref.current, -1)}>
+        <span className="arrowIcon left" aria-hidden />
+      </button>
+      <div className={className} ref={ref}>
+        {children}
+      </div>
+      <button className="selectorArrow selectorArrowRight" type="button" aria-label="Next options" onClick={() => scrollByPage(ref.current, 1)}>
+        <span className="arrowIcon right" aria-hidden />
+      </button>
+    </div>
+  );
 }
 
 function Header() {
@@ -115,8 +139,13 @@ function OptionButton({
   label: string;
   children?: React.ReactNode;
 }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (active) ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [active]);
+
   return (
-    <button className={`optionCard ${active ? "selected" : ""}`} onClick={onClick}>
+    <button className={`optionCard ${active ? "selected" : ""}`} onClick={onClick} ref={ref}>
       <strong>{label}</strong>
       {children}
     </button>
@@ -127,33 +156,78 @@ function SizePanel() {
   const { config, setSize } = useConfigurator();
   if (config.instrument === "bass") {
     return (
-      <div className="optionGrid fixedBassGrid">
+      <HorizontalSelector className="optionGrid fixedBassGrid">
         <OptionButton active onClick={() => undefined} label={sizes["210"].shortLabel}>
           <span className="fixedNote">Fixed bass cabinet</span>
         </OptionButton>
-      </div>
+      </HorizontalSelector>
     );
   }
 
   return (
-    <div className="optionGrid sizeGrid">
+    <HorizontalSelector className="optionGrid sizeGrid">
       {guitarSizes.map((size) => (
         <OptionButton key={size} active={config.size === size} onClick={() => setSize(size)} label={sizes[size].shortLabel}>
           <img src={sizes[size].swatch} alt="" />
         </OptionButton>
       ))}
-    </div>
+    </HorizontalSelector>
   );
 }
 
 function LiveryPanel() {
   const { config, setLivery } = useConfigurator();
   return (
-    <div className="optionGrid threeGrid">
+    <HorizontalSelector className="optionGrid threeGrid">
       {liveryOrder.map((livery) => (
         <OptionButton key={livery} active={config.livery === livery} onClick={() => setLivery(livery)} label={liveries[livery].label}>
           <img src={liveries[livery].swatch} alt="" />
         </OptionButton>
+      ))}
+    </HorizontalSelector>
+  );
+}
+
+function TolexWheel({ slot, value, onChange }: { slot: 0 | 1 | 2; value: TolexColor; onChange: (slot: 0 | 1 | 2, color: TolexColor) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const settling = useRef<number | null>(null);
+
+  useEffect(() => {
+    ref.current?.querySelector<HTMLButtonElement>(`[data-color="${value}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [value]);
+
+  function updateFromScroll() {
+    const wheel = ref.current;
+    if (!wheel) return;
+    const wheelCenter = wheel.getBoundingClientRect().top + wheel.clientHeight / 2;
+    const items = Array.from(wheel.querySelectorAll<HTMLButtonElement>("[data-color]"));
+    const closest = items.reduce((best, item) => {
+      const rect = item.getBoundingClientRect();
+      const distance = Math.abs(rect.top + rect.height / 2 - wheelCenter);
+      return distance < best.distance ? { item, distance } : best;
+    }, { item: items[0], distance: Number.POSITIVE_INFINITY });
+    const color = closest.item?.dataset.color as TolexColor | undefined;
+    if (color && color !== value) onChange(slot, color);
+    if (settling.current) window.clearTimeout(settling.current);
+    settling.current = window.setTimeout(() => {
+      closest.item?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 120);
+  }
+
+  return (
+    <div className="colorWheel" role="listbox" aria-label={`Tolex layer ${slot + 1}`} onScroll={updateFromScroll} ref={ref}>
+      {colorOrder.map((color) => (
+        <button
+          aria-selected={value === color}
+          className={value === color ? "active" : ""}
+          data-color={color}
+          key={color}
+          onClick={() => onChange(slot, color)}
+          style={{ backgroundColor: tolexColors[color].hex }}
+          title={tolexColors[color].label}
+        >
+          <span>{tolexColors[color].label}</span>
+        </button>
       ))}
     </div>
   );
@@ -164,31 +238,10 @@ function TolexPanel() {
   const visibleSlots = config.livery === "shock" ? 3 : 2;
   return (
     <div className="tolexPanel">
-      {([0, 1, 2] as const).map((slot) => (
-        <section className={`tolexSlot ${slot >= visibleSlots ? "locked" : ""}`} key={slot}>
-          <h3>{slot >= visibleSlots ? "N/A" : tolexColors[config.tolex[slot]].label}</h3>
-          {slot >= visibleSlots ? (
-            <div className="lockBadge">Locked</div>
-          ) : (
-            <div className="colorWheel" role="listbox" aria-label={`Tolex layer ${slot + 1}`}>
-              {wheelColors(config.tolex[slot]).map((color) => (
-                <button
-                  aria-selected={config.tolex[slot] === color}
-                  className={config.tolex[slot] === color ? "active" : ""}
-                  key={color}
-                  onClick={() => setTolex(slot, color)}
-                  style={{ backgroundColor: tolexColors[color].hex }}
-                  title={tolexColors[color].label}
-                >
-                  <span>{tolexColors[color].label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          <div
-            className="bigSwatch"
-            style={{ backgroundColor: slot >= visibleSlots ? "#e8dfdc" : tolexColors[config.tolex[slot]].hex }}
-          />
+      {([0, 1, 2] as const).slice(0, visibleSlots).map((slot) => (
+        <section className="tolexSlot" key={slot}>
+          <h3>{tolexColors[config.tolex[slot]].label}</h3>
+          <TolexWheel slot={slot} value={config.tolex[slot]} onChange={setTolex} />
         </section>
       ))}
     </div>
@@ -207,13 +260,13 @@ function GrillPanel() {
   }
 
   return (
-    <div className="optionGrid grillGrid">
+    <HorizontalSelector className="optionGrid grillGrid">
       {grillOrder.map((grill) => (
         <OptionButton key={grill} active={config.grill === grill} onClick={() => setGrill(grill)} label={grills[grill].label}>
           <img src={grills[grill].swatch} alt="" />
         </OptionButton>
       ))}
-    </div>
+    </HorizontalSelector>
   );
 }
 
@@ -287,6 +340,7 @@ function ConfiguratorTab() {
 function SpeakerSelection() {
   const { config, back, next, setSpeaker } = useConfigurator();
   const [selectedHole, setSelectedHole] = useState<number | null>(null);
+  const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker>("creamback");
   if (!config.size || config.size === "210") return null;
 
   const handleDrop = (index: number, speaker: Speaker) => {
@@ -307,8 +361,8 @@ function SpeakerSelection() {
           {Array.from({ length: sizes[config.size].speakerCount }).map((_, index) => (
             <button
               className={`speakerHole ${selectedHole === index ? "selected" : ""}`}
-              style={{ left: `${layout[index].x}%`, top: `${layout[index].y}%` }}
-              key={index}
+              style={zoneStyle(layout[index])}
+              key={layout[index].id}
               onDragOver={(event) => event.preventDefault()}
               onDrop={(event) => handleDrop(index, event.dataTransfer.getData("speaker") as Speaker)}
               onPointerUp={() => setSelectedHole(index)}
@@ -320,15 +374,20 @@ function SpeakerSelection() {
       </section>
       <section className="speakerChooser">
         <p>Drag into an opening, or tap an empty opening then choose a speaker.</p>
-        <div className="speakerOptions">
+        <HorizontalSelector className="speakerOptions">
           {speakerOrder.map((speaker) => (
             <button
+              className={selectedSpeaker === speaker ? "selected" : ""}
               key={speaker}
               draggable
-              onDragStart={(event) => event.dataTransfer.setData("speaker", speaker)}
+              onDragStart={(event) => {
+                setSelectedSpeaker(speaker);
+                event.dataTransfer.setData("speaker", speaker);
+              }}
               onClick={() => {
                 const emptyIndex = config.speakers.findIndex((item) => !item);
                 const targetIndex = selectedHole ?? (emptyIndex === -1 ? 0 : emptyIndex);
+                setSelectedSpeaker(speaker);
                 setSpeaker(targetIndex, speaker);
                 setSelectedHole(null);
               }}
@@ -338,7 +397,7 @@ function SpeakerSelection() {
               <span>{speakerOptions[speaker].tone}</span>
             </button>
           ))}
-        </div>
+        </HorizontalSelector>
       </section>
     </main>
   );

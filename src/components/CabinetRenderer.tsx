@@ -48,7 +48,16 @@ export function CabinetRenderer({ instrument, size, livery, tolex, grill, grillP
               {(speakerLayouts[size as Exclude<CabinetSize, "210">] ?? []).map((pos, index) => {
                 const speaker = speakers[index];
                 return (
-                  <span className="speakerPreview" style={{ left: `${pos.x}%`, top: `${pos.y}%` }} key={index}>
+                  <span
+                    className="speakerPreview"
+                    style={{
+                      left: `${(pos.x / 2000) * 100}%`,
+                      top: `${(pos.y / 2000) * 100}%`,
+                      width: `${(pos.width / 2000) * 100}%`,
+                      height: `${(pos.height / 2000) * 100}%`,
+                    }}
+                    key={pos.id}
+                  >
                     {speaker ? <img src={speakerOptions[speaker].asset} alt="" draggable={false} /> : <span />}
                   </span>
                 );
