@@ -2222,6 +2222,7 @@ body,
 .startupPreloaderIcon {
   width: clamp(78px, 19vw, 132px);
   height: auto;
+  align-items: center;
   transform-origin: 50% 50%;
   filter: drop-shadow(0 8px 16px rgba(240, 82, 91, 0.22));
 }

@@ -56,7 +56,7 @@ export const tolexColors: Record<TolexColor, { label: string; hex: string; vendo
   white: { label: "White", hex: "#e9e9e9", vendor: "SBS", style: "Levant", swatch: assetPath("assets/swatches/colors/white.png") },
   flamingo_pink: { label: "Flamingo Pink", hex: "#ec5d75", vendor: "Mojotone", style: "Levant", swatch: assetPath("assets/swatches/colors/flamingo_pink.png") },
   orange: { label: "Orange", hex: "#f27f2f", vendor: "SBS", style: "Levant", swatch: assetPath("assets/swatches/colors/orange.png") },
-  red: { label: "Red", hex: "#ffffff", vendor: "SBS", style: "Levant", swatch: assetPath("assets/swatches/colors/red.png") },
+  red: { label: "Red", hex: "#ff0000", vendor: "SBS", style: "Levant", swatch: assetPath("assets/swatches/colors/red.png") },
 };
 
 export const colorOrder = Object.keys(tolexColors) as TolexColor[];
