@@ -63,11 +63,11 @@ function InstrumentSelection() {
       </div>
       <section className="chooserBand">
         <span className="upIcon" aria-hidden />
-        <h1>Choose Your Instrument</h1>
+        <h3>Choose Your Instrument</h3>
         <span className="upIcon" aria-hidden />
       </section>
       <section className="disclaimer">
-        <h2>Super Technical and Critical Disclaimer</h2>
+        <h4>Super Technical and Critical Disclaimer</h4>
         <p>The renders are digital and our cabs are real. Colors, patterns, textures, and stage vibes may vary when the amp gets loud.</p>
       </section>
     </main>
