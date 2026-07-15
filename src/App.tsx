@@ -19,15 +19,16 @@ import { useConfigurator } from "./store/ConfiguratorContext";
 
 const tabs = ["size", "livery", "tolex", "grill", "trim"] as const;
 
+function wheelColors(activeColor: TolexColor) {
+  const activeIndex = colorOrder.indexOf(activeColor);
+  const start = Math.max(0, activeIndex - 1);
+  return [...colorOrder.slice(start), ...colorOrder.slice(0, start)];
+}
+
 function Header() {
   return (
     <header className="brandHeader">
-      <div className="buildMark">
-        <span />
-        <strong>Build Your</strong>
-        <span />
-      </div>
-      <img src={assetPath("assets/shrimp_header logo.png")} alt="Shrimp" />
+      <img src={assetPath("assets/config_header.png")} alt="Build Your Shrimp" />
     </header>
   );
 }
@@ -123,6 +124,16 @@ function OptionButton({
 
 function SizePanel() {
   const { config, setSize } = useConfigurator();
+  if (config.instrument === "bass") {
+    return (
+      <div className="optionGrid fixedBassGrid">
+        <OptionButton active onClick={() => undefined} label={sizes["210"].shortLabel}>
+          <span className="fixedNote">Fixed bass cabinet</span>
+        </OptionButton>
+      </div>
+    );
+  }
+
   return (
     <div className="optionGrid sizeGrid">
       {guitarSizes.map((size) => (
@@ -158,13 +169,20 @@ function TolexPanel() {
           {slot >= visibleSlots ? (
             <div className="lockBadge">Locked</div>
           ) : (
-            <select value={config.tolex[slot]} onChange={(event) => setTolex(slot, event.target.value as TolexColor)}>
-              {colorOrder.map((color) => (
-                <option value={color} key={color}>
-                  {tolexColors[color].label}
-                </option>
+            <div className="colorWheel" role="listbox" aria-label={`Tolex layer ${slot + 1}`}>
+              {wheelColors(config.tolex[slot]).map((color) => (
+                <button
+                  aria-selected={config.tolex[slot] === color}
+                  className={config.tolex[slot] === color ? "active" : ""}
+                  key={color}
+                  onClick={() => setTolex(slot, color)}
+                  style={{ backgroundColor: tolexColors[color].hex }}
+                  title={tolexColors[color].label}
+                >
+                  <span>{tolexColors[color].label}</span>
+                </button>
               ))}
-            </select>
+            </div>
           )}
           <div
             className="bigSwatch"
@@ -178,6 +196,15 @@ function TolexPanel() {
 
 function GrillPanel() {
   const { config, setGrill } = useConfigurator();
+  if (config.instrument === "bass") {
+    return (
+      <div className="fixedPanel">
+        <h2>Black Aluminum Grill</h2>
+        <p>Fixed black powder-coated aluminum grill with two Celestion BN10-300X drivers.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="optionGrid grillGrid">
       {grillOrder.map((grill) => (
@@ -191,6 +218,15 @@ function GrillPanel() {
 
 function TrimPanel() {
   const { config, setGrillPipe, setCorners } = useConfigurator();
+  if (config.instrument === "bass") {
+    return (
+      <div className="fixedPanel">
+        <h2>Fixed Bass Trim</h2>
+        <p>Bass corners, grill trim, and speaker loading are represented in the 2x10 render and are not exposed as options in this prototype phase.</p>
+      </div>
+    );
+  }
+
   const trimChoice = (type: "pipe" | "corner", value: PipeColor | "chrome", label: string) => {
     const active = type === "pipe" ? config.grillPipe === value : config.corners === value;
     return (
@@ -220,42 +256,21 @@ function TrimPanel() {
 function ConfiguratorScreen() {
   const { config, setActiveTab } = useConfigurator();
   if (!config.instrument) return null;
-  const isBass = config.instrument === "bass";
 
   return (
     <main className="workbench">
       <PreviewPanel />
       <section className="controlDock">
-        {!isBass && (
-          <nav className="tabs" aria-label="Cabinet configuration">
-            {tabs.map((tab) => (
-              <button className={config.activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)} key={tab}>
-                {tab}
-              </button>
-            ))}
-          </nav>
-        )}
-        {isBass ? <BassFixedPanel /> : <ConfiguratorTab />}
+        <nav className="tabs" aria-label="Cabinet configuration">
+          {tabs.map((tab) => (
+            <button className={config.activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)} key={tab}>
+              {tab}
+            </button>
+          ))}
+        </nav>
+        <ConfiguratorTab />
       </section>
     </main>
-  );
-}
-
-function BassFixedPanel() {
-  const { config, setLivery } = useConfigurator();
-  return (
-    <div className="bassPanel">
-      <h2>2x10 Bass Cab</h2>
-      <p>Fixed black powder-coated aluminum grill, fixed corners, and two Celestion BN10-300X drivers.</p>
-      <div className="optionGrid threeGrid">
-        {liveryOrder.map((livery) => (
-          <OptionButton key={livery} active={config.livery === livery} onClick={() => setLivery(livery)} label={liveries[livery].label}>
-            <img src={liveries[livery].swatch} alt="" />
-          </OptionButton>
-        ))}
-      </div>
-      <TolexPanel />
-    </div>
   );
 }
 
