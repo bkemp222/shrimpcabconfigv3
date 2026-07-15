@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CabinetSize, Grill, Instrument, Livery, Speaker, TolexColor } from "./data/configuratorData";
 import {
   colorOrder,
@@ -22,6 +22,71 @@ const tabs = ["size", "livery", "tolex", "grill", "trim"] as const;
 const wheelCopies = 5;
 const wheelMiddleCopy = Math.floor(wheelCopies / 2);
 const loopedColors = Array.from({ length: wheelCopies }, () => colorOrder).flat();
+const startupMessages = [
+  "Cutting tolex…",
+  "Spilling the glue…",
+  "Reloading staple gun…",
+  "Looking for good album to play…",
+  "Sanding…",
+  "More sanding…",
+  "Even more sanding…",
+  "Feeding the shrimp…",
+  "Bathroom break…",
+  "Reticulating splines…",
+  "Riff break…",
+  "Daydreaming about stuff…",
+  "Stretching grill cloth…",
+  "Summoning cabinet gnomes for assistance…",
+] as const;
+const startupSpinDuration = 2800;
+const startupMinimumDuration = 1500;
+
+function startupAssets() {
+  const defaultSize = "212v" as const;
+  const defaultLivery = "nitro" as const;
+  const defaultGrill = "blackbasket" as const;
+
+  return [
+    assetPath("assets/loading_icon.svg"),
+    assetPath("assets/config_header.png"),
+    assetPath("assets/instrument_select.png"),
+    assetPath("assets/swatches/instruments/bass_idle.png"),
+    assetPath("assets/swatches/instruments/bass_active.png"),
+    assetPath("assets/swatches/instruments/guitar_idle.png"),
+    assetPath("assets/swatches/instruments/guitar_active.png"),
+    sizes[defaultSize].base,
+    sizes[defaultSize].swatch,
+    liveries[defaultLivery].swatch,
+    assetPath(`assets/${defaultSize}/svg/${defaultLivery}_body.svg`),
+    assetPath(`assets/${defaultSize}/svg/${defaultLivery}_flames.svg`),
+    assetPath(`assets/${defaultSize}/grills/${grills[defaultGrill].assetName}.png`),
+    grills[defaultGrill].swatch,
+    assetPath(`assets/${defaultSize}/piping/${defaultLivery}_white.png`),
+    assetPath(`assets/${defaultSize}/piping/grill_white.png`),
+  ].filter(Boolean) as string[];
+}
+
+function preloadImage(src: string) {
+  return new Promise<void>((resolve) => {
+    const image = new Image();
+    const timeout = window.setTimeout(() => {
+      console.warn("Startup asset preload timed out", src);
+      resolve();
+    }, 3500);
+    const finish = (failed = false) => {
+      window.clearTimeout(timeout);
+      if (failed) console.warn("Startup asset failed to preload", src);
+      resolve();
+    };
+    image.onload = () => finish();
+    image.onerror = () => finish(true);
+    image.src = src;
+  });
+}
+
+function easeOutCubic(progress: number) {
+  return 1 - Math.pow(1 - progress, 3);
+}
 
 function scrollByPage(container: HTMLDivElement | null, direction: -1 | 1) {
   container?.scrollBy({ left: direction * container.clientWidth * 0.72, behavior: "smooth" });
@@ -76,6 +141,97 @@ function NavButton({ direction, onClick, children }: { direction: "back" | "next
       {children}
       {direction === "next" && <span className="arrowIcon right" aria-hidden />}
     </button>
+  );
+}
+
+function StartupPreloader({ onDone }: { onDone: () => void }) {
+  const [messageIndex, setMessageIndex] = useState(() => Math.floor(Math.random() * startupMessages.length));
+  const [messageVisible, setMessageVisible] = useState(true);
+  const [isSpinning, setIsSpinning] = useState(true);
+  const [settleAngle, setSettleAngle] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
+  const spinStart = useRef(performance.now());
+  const ready = useRef(false);
+
+  useEffect(() => {
+    const tick = () => {
+      if (ready.current) return;
+      setMessageVisible(false);
+      window.setTimeout(() => {
+        if (ready.current) return;
+        setMessageIndex((index) => (index + 1) % startupMessages.length);
+        setMessageVisible(true);
+      }, 180);
+      window.setTimeout(tick, 1200 + Math.random() * 600);
+    };
+    const timer = window.setTimeout(tick, 1200 + Math.random() * 600);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.all([Promise.all(startupAssets().map(preloadImage)), new Promise((resolve) => window.setTimeout(resolve, startupMinimumDuration))]).then(() => {
+      if (cancelled) return;
+      ready.current = true;
+      setMessageVisible(false);
+
+      window.setTimeout(() => {
+        if (cancelled) return;
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion) {
+          setIsSpinning(false);
+          setSettleAngle(0);
+          setIsExiting(true);
+          window.setTimeout(() => {
+            if (!cancelled) onDone();
+          }, 140);
+          return;
+        }
+        const currentAngle = ((performance.now() - spinStart.current) % startupSpinDuration) / startupSpinDuration * 360;
+        const remaining = currentAngle === 0 ? 360 : 360 - currentAngle;
+        const settleDuration = Math.max(420, Math.min(900, (remaining / 360) * startupSpinDuration));
+        const settleStartedAt = performance.now();
+
+        setIsSpinning(false);
+        setSettleAngle(currentAngle);
+
+        const animateSettle = (now: number) => {
+          if (cancelled) return;
+          const progress = Math.min(1, (now - settleStartedAt) / settleDuration);
+          setSettleAngle(currentAngle + remaining * easeOutCubic(progress));
+          if (progress < 1) {
+            window.requestAnimationFrame(animateSettle);
+            return;
+          }
+          setSettleAngle(360);
+          setIsExiting(true);
+          window.setTimeout(() => {
+            if (!cancelled) onDone();
+          }, 460);
+        };
+
+        window.requestAnimationFrame(animateSettle);
+      }, 260);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [onDone]);
+
+  return (
+    <section className={`startupPreloader ${isExiting ? "exiting" : ""}`} aria-label="Loading Build Your Shrimp">
+      <div className="startupPreloaderInner">
+        <img
+          className={`startupPreloaderIcon ${isSpinning ? "spinning" : ""}`}
+          src={assetPath("assets/loading_icon.svg")}
+          alt=""
+          style={isSpinning ? undefined : { transform: `rotate(${settleAngle}deg)` }}
+        />
+        <p className={`startupPreloaderMessage ${messageVisible ? "visible" : ""}`}>{startupMessages[messageIndex]}</p>
+      </div>
+    </section>
   );
 }
 
@@ -501,13 +657,17 @@ function ReviewScreen() {
 
 export function App() {
   const { config } = useConfigurator();
+  const [preloaderDone, setPreloaderDone] = useState(false);
+  const finishPreloader = useCallback(() => setPreloaderDone(true), []);
+
   return (
-    <div className={`app ${config.screen === "review" ? "reviewMode" : ""}`}>
+    <div className={`app ${config.screen === "review" ? "reviewMode" : ""} ${preloaderDone ? "preloaderReady" : "preloaderActive"}`}>
       <Header />
       {config.screen === "instrument" && <InstrumentSelection />}
       {config.screen === "configurator" && <ConfiguratorScreen />}
       {config.screen === "speakers" && <SpeakerSelection />}
       {config.screen === "review" && <ReviewScreen />}
+      {!preloaderDone && <StartupPreloader onDone={finishPreloader} />}
     </div>
   );
 }

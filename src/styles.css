@@ -2167,3 +2167,121 @@ video {
     outline: 2px solid var(--accent);
   }
 }
+
+/* Startup preloader: one-time branded app readiness screen. */
+html,
+body,
+#root {
+  background: #050505;
+}
+
+.app.preloaderActive > :not(.startupPreloader) {
+  opacity: 0;
+  transform: scale(0.985);
+}
+
+.app.preloaderReady > :not(.startupPreloader) {
+  animation: appStartupReveal 460ms ease-out both;
+}
+
+.startupPreloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #050505;
+  color: var(--paper);
+  opacity: 1;
+  transition: opacity 460ms ease;
+}
+
+.startupPreloader.exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.startupPreloaderInner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(18px, 4vh, 28px);
+  width: min(86vw, 520px);
+  padding: 24px;
+  transform: scale(1);
+  transition: transform 460ms ease;
+}
+
+.startupPreloader.exiting .startupPreloaderInner {
+  transform: scale(1.035);
+}
+
+.startupPreloaderIcon {
+  width: clamp(78px, 19vw, 132px);
+  height: auto;
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 8px 16px rgba(240, 82, 91, 0.22));
+}
+
+.startupPreloaderIcon.spinning {
+  animation: startupIconSpin 2.8s linear infinite;
+}
+
+.startupPreloaderMessage {
+  width: min(86vw, 420px);
+  min-height: 1.45em;
+  margin: 0;
+  opacity: 0;
+  color: var(--paper);
+  font-family: var(--display);
+  font-size: clamp(1.18rem, 3.8vw, 1.7rem);
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: uppercase;
+  transition: opacity 180ms ease;
+}
+
+.startupPreloaderMessage.visible {
+  opacity: 1;
+}
+
+@keyframes startupIconSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes appStartupReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app.preloaderActive > :not(.startupPreloader),
+  .app.preloaderReady > :not(.startupPreloader),
+  .startupPreloaderInner,
+  .startupPreloader.exiting .startupPreloaderInner {
+    transform: none;
+    animation: none;
+  }
+
+  .startupPreloaderIcon.spinning {
+    animation: none;
+  }
+
+  .startupPreloader,
+  .startupPreloaderMessage {
+    transition-duration: 120ms;
+  }
+}
