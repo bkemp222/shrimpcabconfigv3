@@ -1,0 +1,218 @@
+ROOT DIRECTORY
+/Users/bradkemp/Desktop/Get Up Creative/Shrimp Cab Co./Website/Build Your Shrimp V3/shrimp config test
+.
+├── assets
+│   ├── 112
+│   │   ├── base
+│   │   │   └── base.png
+│   │   ├── corners
+│   │   │   └── chrome.png
+│   │   ├── grills
+│   │   │   ├── agedsilver.png
+│   │   │   ├── blackbasket.png
+│   │   │   ├── fendersilver.png
+│   │   │   ├── oxblood.png
+│   │   │   ├── saltpepper.png
+│   │   │   └── smallcane.png
+│   │   ├── piping
+│   │   │   ├── grill_black.png
+│   │   │   ├── grill_white.png
+│   │   │   ├── nitro_black.png
+│   │   │   ├── nitro_white.png
+│   │   │   ├── shock_black.png
+│   │   │   ├── shock_white.png
+│   │   │   ├── tiger_black.png
+│   │   │   └── tiger_white.png
+│   │   └── svg
+│   │       ├── nitro_body.svg
+│   │       ├── nitro_flames.svg
+│   │       ├── shock_bolt.svg
+│   │       ├── shock_bottom.svg
+│   │       ├── shock_top.svg
+│   │       ├── tiger_body.svg
+│   │       └── tiger_stripes.svg
+│   ├── 210
+│   │   ├── base
+│   │   │   └── base.png
+│   │   ├── grills
+│   │   ├── piping
+│   │   │   ├── nitro_black.png
+│   │   │   ├── nitro_white.png
+│   │   │   ├── shock_black.png
+│   │   │   ├── shock_white.png
+│   │   │   ├── tiger_black.png
+│   │   │   └── tiger_white.png
+│   │   └── svg
+│   │       ├── nitro_body.svg
+│   │       ├── nitro_flames.svg
+│   │       ├── shock_bolt.svg
+│   │       ├── shock_bottom.svg
+│   │       ├── shock_top.svg
+│   │       ├── tiger_body.svg
+│   │       └── tiger_stripes.svg
+│   ├── 212h
+│   │   ├── base
+│   │   │   └── 212h_base.png
+│   │   ├── corners
+│   │   │   └── chrome.png
+│   │   ├── grills
+│   │   │   ├── agedsilver.png
+│   │   │   ├── blackbasket.png
+│   │   │   ├── fendersilver.png
+│   │   │   ├── oxblood.png
+│   │   │   ├── saltpepper.png
+│   │   │   └── smallcane.png
+│   │   ├── piping
+│   │   │   ├── grill_black.png
+│   │   │   ├── grill_white.png
+│   │   │   ├── nitro_black.png
+│   │   │   ├── nitro_white.png
+│   │   │   ├── shock_black.png
+│   │   │   ├── shock_white.png
+│   │   │   ├── tiger_black.png
+│   │   │   └── tiger_white.png
+│   │   └── svg
+│   │       ├── nitro_body.svg
+│   │       ├── nitro_flames.svg
+│   │       ├── shock_bolt.svg
+│   │       ├── shock_bottom.svg
+│   │       ├── shock_top.svg
+│   │       ├── tiger_body.svg
+│   │       └── tiger_stripes.svg
+│   ├── 212v
+│   │   ├── base
+│   │   │   └── base.png
+│   │   ├── corners
+│   │   │   └── chrome.png
+│   │   ├── grills
+│   │   │   ├── agedsilver.png
+│   │   │   ├── blackbasket.png
+│   │   │   ├── fendersilver.png
+│   │   │   ├── oxblood.png
+│   │   │   ├── saltpepper.png
+│   │   │   └── smallcane.png
+│   │   ├── piping
+│   │   │   ├── grill_black.png
+│   │   │   ├── grill_white.png
+│   │   │   ├── nitro_black.png
+│   │   │   ├── nitro_white.png
+│   │   │   ├── shock_black.png
+│   │   │   ├── shock_white.png
+│   │   │   ├── tiger_black.png
+│   │   │   └── tiger_white.png
+│   │   └── svg
+│   │       ├── nitro_body.svg
+│   │       ├── nitro_flames.svg
+│   │       ├── shock_bolt.svg
+│   │       ├── shock_bottom.svg
+│   │       ├── shock_top.svg
+│   │       ├── tiger_body.svg
+│   │       └── tiger_stripes.svg
+│   ├── 412
+│   │   ├── base
+│   │   │   └── base.png
+│   │   ├── corners
+│   │   │   └── chrome.png
+│   │   ├── grills
+│   │   │   ├── agedsilver.png
+│   │   │   ├── blackbasket.png
+│   │   │   ├── fendersilver.png
+│   │   │   ├── oxblood.png
+│   │   │   ├── saltpepper.png
+│   │   │   └── smallcane.png
+│   │   ├── piping
+│   │   │   ├── grill_black.png
+│   │   │   ├── grill_white.png
+│   │   │   ├── nitro_black.png
+│   │   │   ├── nitro_white.png
+│   │   │   ├── shock_black.png
+│   │   │   ├── shock_white.png
+│   │   │   ├── tiger_black.png
+│   │   │   └── tiger_white.png
+│   │   └── svg
+│   │       ├── nitro_body.svg
+│   │       ├── nitro_flames.svg
+│   │       ├── shock_bolt.svg
+│   │       ├── shock_bottom.svg
+│   │       ├── shock_top.svg
+│   │       ├── tiger_body.svg
+│   │       └── tiger_stripes.svg
+│   ├── speakers
+│   │   ├── 112_speakers.svg
+│   │   ├── 212h_speakers.svg
+│   │   ├── 212v_speakers.svg
+│   │   ├── 412_speakers.svg
+│   │   ├── creamback.svg
+│   │   ├── greenback.svg
+│   │   └── v30.svg
+│   ├── swatches
+│   │   ├── colors
+│   │   │   ├── apple_green.png
+│   │   │   ├── black.png
+│   │   │   ├── british_green.png
+│   │   │   ├── carolina_blue.png
+│   │   │   ├── cocoa.png
+│   │   │   ├── flamingo_pink.png
+│   │   │   ├── ivory.png
+│   │   │   ├── metallic_gold.png
+│   │   │   ├── metallic_silver.png
+│   │   │   ├── navy.png
+│   │   │   ├── orange.png
+│   │   │   ├── pink.png
+│   │   │   ├── purple.png
+│   │   │   ├── red.png
+│   │   │   ├── regency_blue.png
+│   │   │   ├── seafoam_green.png
+│   │   │   ├── teal_levant.png
+│   │   │   ├── white.png
+│   │   │   └── yellow.png
+│   │   ├── grills
+│   │   │   ├── agedsilver_active.png
+│   │   │   ├── agedsilver_idle.png
+│   │   │   ├── blackbasket_active.png
+│   │   │   ├── blackbasket_idle.png
+│   │   │   ├── fendersilver_active.png
+│   │   │   ├── fendersilver_idle.png
+│   │   │   ├── oxblood_active.png
+│   │   │   ├── oxblood_idle.png
+│   │   │   ├── saltpepper_active.png
+│   │   │   ├── saltpepper_idle.png
+│   │   │   ├── smallcane_active.png
+│   │   │   └── smallcane_idle.png
+│   │   ├── instruments
+│   │   │   ├── bass_active.png
+│   │   │   ├── bass_idle.png
+│   │   │   ├── guitar_active.png
+│   │   │   └── guitar_idle.png
+│   │   ├── liveries
+│   │   │   ├── nitro_active.png
+│   │   │   ├── nitro_idle.png
+│   │   │   ├── shock_active.png
+│   │   │   ├── shock_idle.png
+│   │   │   ├── tiger_active.png
+│   │   │   └── tiger_idle.png
+│   │   └── size
+│   │       ├── 112_active.png
+│   │       ├── 112_idle.png
+│   │       ├── 212h_active.png
+│   │       ├── 212h_idle.png
+│   │       ├── 212v_active.png
+│   │       ├── 212v_idle.png
+│   │       ├── 412_active.png
+│   │       └── 412_idle.png
+│   ├── config_header.png
+│   ├── instrument_select.png
+│   └── shrimp_header logo.png
+├── reference
+│   ├── static_ui
+│   │   ├── grill.png
+│   │   ├── landing.png
+│   │   ├── livery.png
+│   │   ├── size.png
+│   │   ├── speakers.png
+│   │   ├── tolex.png
+│   │   └── trim.png
+│   └── tolex_hex.png
+└── hierarchy.txt
+
+40 directories, 174 files
