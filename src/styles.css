@@ -2024,7 +2024,7 @@ video {
 }
 
 .speakerOptions button {
-  padding: 3px 3px 4px;
+  padding: 0px;
   gap: 1px;
   font-size: clamp(0.58rem, 1.95vw, 0.72rem);
 }
