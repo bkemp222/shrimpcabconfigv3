@@ -2019,8 +2019,8 @@ video {
 }
 
 .speakerOptions {
-  grid-auto-columns: clamp(94px, 32vw, 130px);
-  gap: clamp(4px, 1.8vw, 8px);
+  grid-auto-columns: clamp(60px, 28vw, 100px);
+  gap: clamp(2px, 1.4vw, 6px);
 }
 
 .speakerOptions button {
