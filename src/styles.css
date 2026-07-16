@@ -2030,7 +2030,7 @@ video {
 }
 
 .speakerOptions img {
-  width: clamp(44px, 11svh, 68px);
+  width: clamp(30px, 8svh, 45px);
 }
 
 .reviewMode .brandHeader {
