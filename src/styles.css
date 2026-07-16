@@ -318,7 +318,6 @@ button {
 }
 
 .optionGrid,
-.tolexPanel,
 .trimPanel,
 .bassPanel {
   padding: clamp(22px, 4vw, 54px);
@@ -360,36 +359,6 @@ button {
   width: 84px;
   max-width: 100%;
   height: auto;
-}
-
-.tolexPanel {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.tolexSlot {
-  display: grid;
-  gap: 14px;
-  justify-items: center;
-  text-align: center;
-}
-
-.tolexSlot h3,
-.trimPanel h3 {
-  margin: 0;
-  text-transform: uppercase;
-  font-size: clamp(1.25rem, 2.3vw, 2rem);
-}
-
-.tolexSlot select {
-  width: 100%;
-  min-height: 48px;
-  border: 3px solid var(--muted);
-  border-radius: 8px;
-  background: white;
-  font-family: Arial, sans-serif;
-  font-weight: 800;
 }
 
 .bigSwatch,
@@ -816,7 +785,6 @@ button {
 }
 
 .optionGrid,
-.tolexPanel,
 .trimPanel,
 .bassPanel,
 .fixedPanel {
@@ -966,13 +934,19 @@ button {
 .tolexPanel {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(8px, 3vw, 28px);
+  gap: clamp(6px, 2vw, 10px);
+  align-items: stretch;
+  min-height: 0;
+  height: 100%;
+  padding: clamp(6px, 1.4svh, 11px) clamp(7px, 2.4vw, 12px);
+  overflow: hidden;
 }
 
 .tolexSlot {
   display: grid;
-  gap: 8px;
+  gap: 5px;
   justify-items: center;
+  align-content: center;
   text-align: center;
   min-width: 0;
 }
@@ -989,36 +963,58 @@ button {
 
 .colorWheel {
   position: relative;
-  width: min(100%, 98px);
-  height: clamp(76px, 11svh, 118px);
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  padding: 2px;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
+  display: block;
+  width: min(100%, 78px);
+  height: clamp(112px, 17svh, 154px);
+  padding-block: clamp(34px, 7svh, 48px);
+  overflow: hidden;
+  align-content: start;
+  overscroll-behavior: contain;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
   scrollbar-width: none;
-  mask-image: linear-gradient(transparent 0, #000 22%, #000 78%, transparent 100%);
+  border-radius: 14px;
+  background: rgba(5, 5, 5, 0.08);
+  mask-image: linear-gradient(transparent 0, #000 24%, #000 76%, transparent 100%);
 }
 
-.colorWheel::-webkit-scrollbar {
-  display: none;
+.colorWheel:active {
+  cursor: grabbing;
+}
+
+.colorWheelTrack {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  will-change: transform;
 }
 
 .colorWheel button {
   position: relative;
-  width: clamp(42px, 8svh, 70px);
+  width: clamp(38px, 7.5svh, 50px);
   aspect-ratio: 1;
   flex: 0 0 auto;
-  border: 3px solid #5a5a56;
+  border: 2px solid #5a5a56;
   border-radius: 10px;
   box-shadow: inset 16px 0 24px rgba(255, 255, 255, 0.22);
-  scroll-snap-align: center;
+  transition:
+    opacity 90ms ease,
+    outline-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .colorWheel button.active {
-  outline: 4px solid var(--accent);
-  outline-offset: 3px;
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow:
+    inset 16px 0 24px rgba(255, 255, 255, 0.22),
+    0 0 14px rgba(255, 79, 93, 0.32);
+  animation: none;
+}
+
+.colorWheel.settled button.active {
+  animation: tolexSettle 180ms ease-out;
 }
 
 .colorWheel span {
@@ -1315,7 +1311,6 @@ video {
 }
 
 .optionGrid,
-.tolexPanel,
 .trimPanel,
 .fixedPanel {
   min-height: 0;
@@ -1327,7 +1322,6 @@ video {
 }
 
 .optionGrid::-webkit-scrollbar,
-.tolexPanel::-webkit-scrollbar,
 .trimPanel::-webkit-scrollbar,
 .speakerOptions::-webkit-scrollbar {
   display: none;
@@ -1363,30 +1357,6 @@ video {
 
 .optionCard img {
   width: clamp(42px, 9svh, 64px);
-}
-
-.tolexPanel {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(6px, 2vw, 10px);
-}
-
-.tolexSlot {
-  gap: 5px;
-}
-
-.colorWheel {
-  width: min(100%, 78px);
-  height: clamp(68px, 10svh, 88px);
-}
-
-.colorWheel button {
-  width: clamp(38px, 7.5svh, 50px);
-  border-width: 2px;
-}
-
-.colorWheel button.active {
-  outline-width: 3px;
-  outline-offset: 2px;
 }
 
 .bigSwatch,
@@ -1744,45 +1714,6 @@ video {
   margin-top: 0;
 }
 
-.tolexPanel {
-  align-items: stretch;
-  overflow: hidden;
-}
-
-.tolexSlot {
-  align-content: center;
-}
-
-.colorWheel {
-  height: clamp(112px, 17svh, 154px);
-  padding-block: clamp(34px, 7svh, 48px);
-  align-content: start;
-  scroll-snap-type: y mandatory;
-  scroll-padding-block: 50%;
-  border-radius: 14px;
-  background: rgba(5, 5, 5, 0.08);
-  mask-image: linear-gradient(transparent 0, #000 24%, #000 76%, transparent 100%);
-}
-
-.colorWheel button {
-  opacity: 0.48;
-  transform: scale(0.82);
-  transition:
-    opacity 140ms ease,
-    transform 140ms ease,
-    outline-color 140ms ease,
-    box-shadow 140ms ease;
-}
-
-.colorWheel button.active {
-  opacity: 1;
-  transform: scale(1.12);
-  box-shadow:
-    inset 16px 0 24px rgba(255, 255, 255, 0.22),
-    0 0 14px rgba(255, 79, 93, 0.32);
-  animation: selectedPulse 3s ease-in-out infinite;
-}
-
 .bigSwatch,
 .lockBadge {
   display: none;
@@ -1998,7 +1929,6 @@ video {
 }
 
 .optionGrid,
-.tolexPanel,
 .trimPanel,
 .fixedPanel {
   padding: clamp(6px, 1.4svh, 11px) clamp(7px, 2.4vw, 12px);
@@ -2073,49 +2003,6 @@ video {
   background: var(--accent);
   color: #050505;
   box-shadow: 0 0 12px rgba(255, 79, 93, 0.28);
-}
-
-.colorWheel {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
-.colorWheel {
-  display: block;
-  overflow: hidden;
-  overscroll-behavior: contain;
-  touch-action: none;
-  user-select: none;
-  cursor: grab;
-  scroll-snap-type: none;
-  scroll-padding-block: 0;
-}
-
-.colorWheel:active {
-  cursor: grabbing;
-}
-
-.colorWheelTrack {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-  will-change: transform;
-}
-
-.colorWheel button {
-  scroll-snap-align: none;
-  transition:
-    opacity 90ms ease,
-    outline-color 120ms ease,
-    box-shadow 120ms ease;
-}
-
-.colorWheel button.active {
-  animation: none;
-}
-
-.colorWheel.settled button.active {
-  animation: tolexSettle 180ms ease-out;
 }
 
 .speakerPlate.needsHole .speakerHole {
