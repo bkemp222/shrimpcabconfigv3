@@ -539,15 +539,15 @@ button {
 .speakerOptions button {
   display: grid;
   place-items: center;
-  gap: 10px;
+  gap: 4px;
   border: 0;
   background: transparent;
   text-transform: uppercase;
-  font-size: clamp(1rem, 2.3vw, 1.6rem);
+  font-size: clamp(.85rem, 2vw, 1.2rem);
 }
 
 .speakerOptions img {
-  width: min(100%, 210px);
+  width: min(100%, 175px);
 }
 
 .speakerOptions span {
