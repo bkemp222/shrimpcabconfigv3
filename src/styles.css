@@ -2352,6 +2352,6 @@ body,
 
   .startupPreloader,
   .startupPreloaderMessage {
-    transition-duration: 80ms;
+    transition-duration: 60ms;
   }
 }
