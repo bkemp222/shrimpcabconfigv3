@@ -993,8 +993,8 @@ button {
   height: clamp(76px, 11svh, 118px);
   display: grid;
   justify-items: center;
-  gap: 8px;
-  padding: 4px;
+  gap: 6px;
+  padding: 2px;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
