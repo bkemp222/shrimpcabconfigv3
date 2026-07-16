@@ -1764,11 +1764,6 @@ video {
   grid-auto-columns: clamp(124px, 42vw, 172px);
 }
 
-.speakerOptions button {
-  border: 2px solid transparent;
-  background: rgba(248, 242, 230, 0.62);
-}
-
 .speakerOptions img {
   margin-block: 0;
 }
