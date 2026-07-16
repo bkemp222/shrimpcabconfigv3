@@ -334,7 +334,7 @@ function SizePanel() {
     return (
       <HorizontalSelector className="optionGrid fixedBassGrid">
         <OptionButton active onClick={() => undefined} label={sizes["210"].shortLabel}>
-          <span className="fixedNote">Fixed bass cabinet</span>
+          <span className="fixedNote">2x10 Rambler</span>
         </OptionButton>
       </HorizontalSelector>
     );
