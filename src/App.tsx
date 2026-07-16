@@ -623,7 +623,7 @@ function GrillPanel() {
     return (
       <div className="fixedPanel">
         <h2>Black Aluminum Grill</h2>
-        <p>Fixed black powder-coated aluminum grill with two Celestion BN10-300X drivers.</p>
+        <p>Aluminum grill, black powder coated.</p>
       </div>
     );
   }
@@ -750,7 +750,7 @@ function SpeakerSelection() {
         </div>
       </section>
       <section className="speakerChooser">
-        <p className={needsHole ? "speakerCue" : ""}>{needsHole ? "Choose a speaker position first." : "Select a position, then tap a speaker. Dragging also works."}</p>
+        <p className={needsHole ? "speakerCue" : ""}>{needsHole ? "Choose a speaker position first." : "Select a position, then tap a speaker."}</p>
         <HorizontalSelector className="speakerOptions">
           {speakerOrder.map((speaker) => (
             <button
