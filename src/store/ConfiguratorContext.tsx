@@ -77,10 +77,21 @@ function migrateConfig(saved: unknown): ConfiguratorState {
   };
 }
 
+function entryConfig(saved: unknown): ConfiguratorState {
+  return {
+    ...migrateConfig(saved),
+    instrument: null,
+    screen: "instrument",
+    activeTab: "size",
+    size: null,
+    speakers: [],
+  };
+}
+
 function loadInitialState() {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? migrateConfig(JSON.parse(raw)) : initialState;
+    return raw ? entryConfig(JSON.parse(raw)) : initialState;
   } catch {
     return initialState;
   }
